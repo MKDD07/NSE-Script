@@ -1,701 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NSE Live Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #050a0f;
-    --surface: #0b1320;
-    --card: #0f1a2e;
-    --border: #1a2d4a;
-    --accent: #00d4ff;
-    --accent2: #00ff88;
-    --red: #ff4060;
-    --green: #00e676;
-    --yellow: #ffd740;
-    --muted: #4a6080;
-    --text: #e0eeff;
-    --text2: #8baac5;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NSE Live | Institutional Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        syne: ['Syne', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        nseBlue: '#003399',
+                        nseGreen: '#00a364',
+                        nseRed: '#e11d48',
+                        surface: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
 
-  body {
-    font-family: 'JetBrains Mono', monospace;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Glowing orbs */
-  body::after {
-    content: '';
-    position: fixed;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
-    top: -200px; left: -200px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .page { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px; }
-
-  /* HEADER */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 28px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 24px;
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-  }
-  header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
-    animation: shimmer 3s infinite linear;
-    background-size: 200% 100%;
-  }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  .logo {
-    display: flex; align-items: center; gap: 14px;
-  }
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 12px;
-    display: grid; place-items: center;
-    font-size: 20px;
-    font-weight: 800;
-    color: #000;
-    font-family: 'Syne', sans-serif;
-  }
-  .logo h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-  .logo span { color: var(--accent); }
-
-  .header-right { display: flex; align-items: center; gap: 16px; }
-
-  #market-status-badge {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    background: rgba(0,230,118,0.1);
-    border: 1px solid rgba(0,230,118,0.3);
-    font-size: 12px; font-weight: 600;
-    color: var(--green);
-  }
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .last-update {
-    font-size: 11px; color: var(--muted);
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .refresh-btn {
-    background: var(--border);
-    border: 1px solid var(--border);
-    color: var(--accent);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .refresh-btn:hover { background: rgba(0,212,255,0.1); border-color: var(--accent); }
-  .refresh-btn.loading svg { animation: spin 1s infinite linear; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* INDICES ROW */
-  .indices-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .index-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-    cursor: default;
-  }
-  .index-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-  .index-card::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0; width: 3px;
-    background: var(--accent);
-    border-radius: 3px 0 0 3px;
-    opacity: 0.6;
-  }
-  .index-card.up::after { background: var(--green); }
-  .index-card.down::after { background: var(--red); }
-
-  .index-name { font-size: 11px; color: var(--text2); font-weight: 400; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .index-price {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .index-change { font-size: 12px; display: flex; gap: 8px; align-items: center; }
-  .up-color { color: var(--green); }
-  .down-color { color: var(--red); }
-  .neutral { color: var(--muted); }
-
-  /* MAIN GRID */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 24px;
-  }
-
-  @media (max-width: 900px) {
-    .main-grid { grid-template-columns: 1fr; }
-  }
-
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .panel-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-  .panel-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; font-weight: 700;
-    color: var(--text);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .panel-badge {
-    font-size: 10px; padding: 2px 8px;
-    border-radius: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-  }
-  .badge-green { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
-  .badge-red { background: rgba(255,64,96,0.12); color: var(--red); border: 1px solid rgba(255,64,96,0.25); }
-  .badge-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
-
-  .panel-body { padding: 0; }
-
-  .stock-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    padding: 12px 20px;
-    border-bottom: 1px solid rgba(26,45,74,0.5);
-    transition: background 0.15s;
-    gap: 12px;
-  }
-  .stock-row:last-child { border-bottom: none; }
-  .stock-row:hover { background: rgba(0,212,255,0.03); }
-
-  .stock-symbol {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 14px;
-    color: var(--text);
-  }
-  .stock-volume { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .stock-price { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
-  .stock-change-pill {
-    font-size: 11px; font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-align: center;
-    min-width: 64px;
-  }
-  .pill-up { background: rgba(0,230,118,0.12); color: var(--green); }
-  .pill-down { background: rgba(255,64,96,0.12); color: var(--red); }
-
-  /* SEARCH BAR */
-  .search-panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-  .search-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; font-weight: 700; margin-bottom: 14px;
-    color: var(--text);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .search-row { display: flex; gap: 10px; }
-  .search-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 16px;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-    text-transform: uppercase;
-  }
-  .search-input::placeholder { color: var(--muted); text-transform: none; }
-  .search-input:focus { border-color: var(--accent); }
-  .search-btn {
-    background: var(--accent);
-    border: none; color: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .search-btn:hover { opacity: 0.85; }
-
-  #quote-result {
-    margin-top: 16px;
-    display: none;
-  }
-  .quote-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 16px;
-  }
-  @media (max-width: 600px) {
-    .quote-card { grid-template-columns: 1fr 1fr; }
-  }
-  .quote-item-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .quote-item-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
-
-  /* Most Active */
-  .active-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-    padding: 16px;
-  }
-  .active-tile {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    transition: transform 0.15s;
-  }
-  .active-tile:hover { transform: scale(1.03); }
-  .active-tile .sym { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
-  .active-tile .ltp { font-size: 16px; font-weight: 600; margin: 4px 0; }
-  .active-tile .chg { font-size: 11px; }
-
-  /* SKELETON */
-  .skeleton {
-    background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.5s infinite;
-    border-radius: 6px;
-  }
-  @keyframes skeleton-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-  .sk-line { height: 14px; margin: 6px 0; }
-  .sk-block { height: 44px; margin: 8px 0; }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 20px;
-    color: var(--muted);
-    font-size: 11px;
-    border-top: 1px solid var(--border);
-    margin-top: 12px;
-  }
-  footer a { color: var(--accent); text-decoration: none; }
-
-  /* Error state */
-  .error-msg {
-    padding: 16px 20px;
-    color: var(--red);
-    font-size: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  /* Ticker tape */
-  .ticker-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .ticker-tape {
-    display: flex;
-    white-space: nowrap;
-    animation: ticker 40s linear infinite;
-    padding: 10px 0;
-  }
-  .ticker-item {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 0 24px;
-    font-size: 12px;
-    border-right: 1px solid var(--border);
-  }
-  .ticker-item .t-sym { font-weight: 700; color: var(--text); font-family: 'Syne', sans-serif; }
-  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-</style>
+    <style>
+        body { background-color: #f1f5f9; background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px); background-size: 24px 24px; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .ticker-animate { animation: ticker 40s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin 1s infinite linear; }
+        
+        /* Skeleton Animation */
+        .skel-shimmer {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
 </head>
-<body>
-<div class="page">
+<body class="font-sans text-slate-900 antialiased">
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">
-      <div class="logo-icon">N</div>
-      <h1>NSE <span>Live</span></h1>
-    </div>
-    <div class="header-right">
-      <div id="market-status-badge">
-        <span class="status-dot"></span>
-        <span id="status-text">Fetching…</span>
-      </div>
-      <div class="last-update">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="last-update-time">—</span>
-      </div>
-      <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        Refresh
-      </button>
-    </div>
-  </header>
-
-  <!-- TICKER TAPE -->
-  <div class="ticker-wrap" id="ticker-wrap" style="display:none">
-    <div class="ticker-tape" id="ticker-tape"></div>
-  </div>
-
-  <!-- INDICES -->
-  <div class="indices-strip" id="indices-strip">
-    <!-- skeletons -->
-    <div class="index-card" style="height:90px"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-block"></div></div>
-    <div class="index-card" style="height:90px"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-block"></div></div>
-    <div class="index-card" style="height:90px"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-block"></div></div>
-    <div class="index-card" style="height:90px"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-block"></div></div>
-    <div class="index-card" style="height:90px"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-block"></div></div>
-  </div>
-
-  <!-- SEARCH -->
-  <div class="search-panel">
-    <div class="search-title">
-      <svg width="16" height="16" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Stock Quote Lookup
-    </div>
-    <div class="search-row">
-      <input class="search-input" id="quote-input" placeholder="Enter symbol… e.g. RELIANCE, TCS, INFY" onkeydown="if(event.key==='Enter') fetchQuote()"/>
-      <button class="search-btn" onclick="fetchQuote()">GET QUOTE</button>
-    </div>
-    <div id="quote-result"></div>
-  </div>
-
-  <!-- GAINERS / LOSERS -->
-  <div class="main-grid">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <svg width="16" height="16" fill="var(--green)" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          Top Gainers
+<div class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+    
+    <header class="glass rounded-3xl p-6 shadow-xl shadow-slate-200/50 flex flex-col md:flex-row items-center justify-between gap-6 mb-8 border border-white">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-nseBlue rounded-2xl flex items-center justify-center text-white font-syne text-2xl font-extrabold shadow-lg shadow-blue-200">N</div>
+            <div>
+                <h1 class="font-syne text-2xl font-extrabold tracking-tight">NSE<span class="text-nseBlue">LIVE</span></h1>
+                <p class="text-[10px] uppercase tracking-widest font-bold text-slate-400">Institutional Data Feed</p>
+            </div>
         </div>
-        <span class="panel-badge badge-green" id="gainer-count">—</span>
-      </div>
-      <div class="panel-body" id="gainers-list">
-        <div style="padding:20px"><div class="skeleton sk-block"></div><div class="skeleton sk-block"></div><div class="skeleton sk-block"></div></div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <svg width="16" height="16" fill="var(--red)" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-          Top Losers
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <div id="market-status-badge" class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold transition-all">
+                <span class="w-2 h-2 rounded-full bg-slate-400" id="status-dot"></span>
+                <span id="status-text">CONNECTING</span>
+            </div>
+            
+            <div class="flex items-center gap-2 text-slate-400 font-mono text-[11px] bg-white px-3 py-2 rounded-lg border border-slate-100">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="last-update-time">--:--:--</span>
+            </div>
+
+            <button onclick="loadAll()" id="refresh-btn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm active:scale-95 transition-all">
+                <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Refresh
+            </button>
         </div>
-        <span class="panel-badge badge-red" id="loser-count">—</span>
-      </div>
-      <div class="panel-body" id="losers-list">
-        <div style="padding:20px"><div class="skeleton sk-block"></div><div class="skeleton sk-block"></div><div class="skeleton sk-block"></div></div>
-      </div>
-    </div>
-  </div>
+    </header>
 
-  <!-- MOST ACTIVE -->
-  <div class="panel" style="margin-bottom:24px">
-    <div class="panel-header">
-      <div class="panel-title">
-        <svg width="16" height="16" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Most Active by Volume
-      </div>
-      <span class="panel-badge badge-blue">LIVE</span>
+    <div id="ticker-wrap" class="hidden glass border-white overflow-hidden rounded-2xl mb-8 shadow-sm">
+        <div id="ticker-tape" class="ticker-animate flex whitespace-nowrap py-3"></div>
     </div>
-    <div id="active-grid" class="active-grid">
-      <div class="skeleton" style="height:80px;border-radius:10px"></div>
-      <div class="skeleton" style="height:80px;border-radius:10px"></div>
-      <div class="skeleton" style="height:80px;border-radius:10px"></div>
-      <div class="skeleton" style="height:80px;border-radius:10px"></div>
-    </div>
-  </div>
 
-  <footer>
-    NSE Live Dashboard &nbsp;·&nbsp; Data from NSE India &nbsp;·&nbsp;
-    <a href="https://github.com" target="_blank">GitHub</a> &nbsp;·&nbsp;
-    For educational purposes only. Not financial advice.
-  </footer>
+    <div id="indices-strip" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        </div>
+
+    <div class="glass border-white rounded-3xl p-8 mb-8 shadow-lg">
+        <div class="flex items-center gap-2 mb-6">
+            <div class="w-1.5 h-6 bg-nseBlue rounded-full"></div>
+            <h2 class="font-syne text-lg font-bold">Terminal Search</h2>
+        </div>
+        <div class="flex flex-col md:flex-row gap-3">
+            <div class="relative flex-1">
+                <input type="text" id="quote-input" onkeydown="if(event.key==='Enter') fetchQuote()" 
+                    class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-medium focus:border-nseBlue focus:bg-white outline-none transition-all uppercase placeholder:normal-case" 
+                    placeholder="Search stocks (e.g., RELIANCE, TCS)...">
+            </div>
+            <button onclick="fetchQuote()" class="bg-nseBlue text-white px-8 py-4 rounded-2xl font-bold text-sm hover:bg-blue-800 transition-all shadow-lg shadow-blue-100">
+                FETCH DATA
+            </button>
+        </div>
+        <div id="quote-result" class="mt-6"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 flex items-center justify-between bg-emerald-50/30">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-emerald-500 rounded-lg text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <h3 class="font-syne font-bold">Top Gainers</h3>
+                </div>
+                <span id="gainer-count" class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">--</span>
+            </div>
+            <div id="gainers-list" class="divide-y divide-slate-50">
+                </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 flex items-center justify-between bg-rose-50/30">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-rose-500 rounded-lg text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path></svg>
+                    </div>
+                    <h3 class="font-syne font-bold">Top Losers</h3>
+                </div>
+                <span id="loser-count" class="text-[10px] font-bold bg-rose-100 text-rose-700 px-3 py-1 rounded-full">--</span>
+            </div>
+            <div id="losers-list" class="divide-y divide-slate-50">
+                </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="p-2 bg-slate-800 rounded-lg text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <h3 class="font-syne font-bold text-slate-800">Most Active Volume</h3>
+        </div>
+        <div id="active-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            </div>
+    </div>
+
+    <footer class="mt-12 text-center text-slate-400 text-xs font-medium pb-10">
+        <p>© 2026 NSE Live Terminal • Not Financial Advice • <a href="#" class="text-nseBlue hover:underline">Documentation</a></p>
+    </footer>
 </div>
 
 <script>
 // ============================================================
-// CONFIG — change this to your deployed backend URL
+// CONFIG
 // ============================================================
-// ⚠️  STEP 1: Replace the URL below with YOUR Render backend URL
-//     e.g.  "https://nse-dashboard-api.onrender.com"
-//     Leave localhost line untouched — it auto-uses it locally.
-// ============================================================
-const RENDER_URL = "https://nse-script-z8na.onrender.com"; // <-- CHANGE THIS LINE
-// ============================================================
-
+const RENDER_URL = "https://nse-script-z8na.onrender.com"; 
 const API_BASE = ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-  ? "http://localhost:5000"
-  : RENDER_URL).replace(/\/+$/, ""); // strips accidental trailing slash
-
-// Show a visible error banner if user forgot to set the URL
-if (API_BASE.includes("YOUR-APP-NAME")) {
-  document.addEventListener("DOMContentLoaded", () => {
-    const banner = document.createElement("div");
-    banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4060;color:#fff;font-family:monospace;font-size:13px;font-weight:600;padding:12px 20px;text-align:center;";
-    banner.innerHTML = "⚠️ &nbsp;<strong>Setup required:</strong> &nbsp; Open <code>index.html</code>, find <code>RENDER_URL</code> and replace <code>YOUR-APP-NAME</code> with your actual Render backend URL. &nbsp;<a href=\"https://render.com\" target=\"_blank\" style=\"color:#fff;text-decoration:underline\">Deploy on Render →</a>";
-    document.body.prepend(banner);
-  });
-}
+    ? "http://localhost:5000"
+    : RENDER_URL).replace(/\/+$/, "");
 
 const fmt = (n) => n != null ? Number(n).toLocaleString("en-IN", {maximumFractionDigits: 2}) : "—";
 const fmtPct = (n) => n != null ? (n > 0 ? "+" : "") + Number(n).toFixed(2) + "%" : "—";
 
 async function api(path) {
-  const res = await fetch(API_BASE + path);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+    const res = await fetch(API_BASE + path);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
 }
 
-// Market status
 async function loadMarketStatus() {
-  try {
-    const d = await api("/api/market-status");
-    const markets = d.data?.marketState || [];
-    const cm = markets.find(m => m.market === "Capital Market" || m.market === "CM");
-    const txt = document.getElementById("status-text");
-    const badge = document.getElementById("market-status-badge");
-    if (cm) {
-      const isOpen = cm.marketStatus === "Open";
-      txt.textContent = isOpen ? "Market Open" : "Market Closed";
-      badge.style.background = isOpen ? "rgba(0,230,118,0.1)" : "rgba(255,64,96,0.1)";
-      badge.style.borderColor = isOpen ? "rgba(0,230,118,0.3)" : "rgba(255,64,96,0.3)";
-      badge.style.color = isOpen ? "var(--green)" : "var(--red)";
-      badge.querySelector(".status-dot").style.background = isOpen ? "var(--green)" : "var(--red)";
-    } else {
-      txt.textContent = "NSE Live";
-    }
-  } catch(e) {
-    document.getElementById("status-text").textContent = "NSE Live";
-  }
+    try {
+        const d = await api("/api/market-status");
+        const markets = d.data?.marketState || [];
+        const cm = markets.find(m => m.market === "Capital Market" || m.market === "CM");
+        const txt = document.getElementById("status-text");
+        const dot = document.getElementById("status-dot");
+        const badge = document.getElementById("market-status-badge");
+        
+        if (cm) {
+            const isOpen = cm.marketStatus === "Open";
+            txt.textContent = isOpen ? "MARKET OPEN" : "MARKET CLOSED";
+            badge.className = isOpen 
+                ? "flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold"
+                : "flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-xs font-bold";
+            dot.className = `w-2 h-2 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`;
+        }
+    } catch(e) { console.error(e); }
 }
 
-// Indices
 async function loadIndices() {
-  try {
-    const d = await api("/api/indices");
-    const strip = document.getElementById("indices-strip");
-    strip.innerHTML = "";
+    try {
+        const d = await api("/api/indices");
+        const strip = document.getElementById("indices-strip");
+        strip.innerHTML = "";
 
-    // Build ticker tape
-    let tickerHtml = "";
-    const tapeData = [...d.data, ...d.data]; // duplicate for seamless loop
-    tapeData.forEach(idx => {
-      const up = idx.pChange >= 0;
-      const col = up ? "var(--green)" : "var(--red)";
-      tickerHtml += `<div class="ticker-item"><span class="t-sym">${idx.name}</span><span style="color:${col}">${fmt(idx.last)}</span><span style="color:${col}">${fmtPct(idx.pChange)}</span></div>`;
-    });
-    document.getElementById("ticker-tape").innerHTML = tickerHtml;
-    document.getElementById("ticker-wrap").style.display = "block";
+        let tickerHtml = "";
+        const tapeData = [...d.data, ...d.data];
+        tapeData.forEach(idx => {
+            const up = idx.pChange >= 0;
+            const colorClass = up ? "text-emerald-600" : "text-rose-600";
+            tickerHtml += `
+                <div class="flex items-center gap-3 px-8 border-r border-slate-100">
+                    <span class="font-bold text-slate-800 text-xs">${idx.name}</span>
+                    <span class="font-mono text-xs ${colorClass}">${fmt(idx.last)}</span>
+                    <span class="text-[10px] font-bold ${colorClass}">${fmtPct(idx.pChange)}</span>
+                </div>`;
+        });
+        document.getElementById("ticker-tape").innerHTML = tickerHtml;
+        document.getElementById("ticker-wrap").classList.remove("hidden");
 
-    d.data.forEach(idx => {
-      const up = idx.pChange >= 0;
-      const div = document.createElement("div");
-      div.className = `index-card ${up ? "up" : "down"}`;
-      div.innerHTML = `
-        <div class="index-name">${idx.name}</div>
-        <div class="index-price">${fmt(idx.last)}</div>
-        <div class="index-change">
-          <span class="${up ? 'up-color' : 'down-color'}">${fmtPct(idx.pChange)}</span>
-          <span class="${up ? 'up-color' : 'down-color'}">${up?"▲":"▼"} ${fmt(Math.abs(idx.change))}</span>
-        </div>
-        ${idx.pe ? `<div style="font-size:10px;color:var(--muted);margin-top:6px">P/E ${idx.pe}</div>` : ""}
-      `;
-      strip.appendChild(div);
-    });
-
-    document.getElementById("last-update-time").textContent = d.timestamp?.slice(11,19) || new Date().toLocaleTimeString();
-  } catch(e) {
-    document.getElementById("indices-strip").innerHTML = `<div class="error-msg">⚠ Could not load indices: ${e.message}</div>`;
-  }
+        d.data.forEach(idx => {
+            const up = idx.pChange >= 0;
+            const div = document.createElement("div");
+            div.className = "bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group";
+            div.innerHTML = `
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-2 group-hover:text-nseBlue transition-colors">${idx.name}</div>
+                <div class="text-xl font-syne font-bold text-slate-800 mb-1">₹${fmt(idx.last)}</div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold ${up ? 'text-emerald-600' : 'text-rose-600'}">${fmtPct(idx.pChange)}</span>
+                    <span class="text-[10px] text-slate-400">${up?'▲':'▼'} ${fmt(Math.abs(idx.change))}</span>
+                </div>
+            `;
+            strip.appendChild(div);
+        });
+        document.getElementById("last-update-time").textContent = d.timestamp?.slice(11,19) || new Date().toLocaleTimeString();
+    } catch(e) { console.error(e); }
 }
 
-// Gainers & Losers
 async function loadGainersLosers() {
-  try {
-    const d = await api("/api/gainers-losers");
-
-    const renderList = (arr, containerId, up) => {
-      const el = document.getElementById(containerId);
-      if (!arr || !arr.length) { el.innerHTML = '<div class="error-msg">No data</div>'; return; }
-      el.innerHTML = arr.map(s => `
-        <div class="stock-row">
-          <div>
-            <div class="stock-symbol">${s.symbol || "—"}</div>
-            <div class="stock-volume">Vol: ${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</div>
-          </div>
-          <div class="stock-price">₹${fmt(s.ltp)}</div>
-          <div class="stock-change-pill ${up ? 'pill-up' : 'pill-down'}">${fmtPct(s.netPrice)}</div>
-        </div>
-      `).join("");
-    };
-
-    renderList(d.gainers, "gainers-list", true);
-    renderList(d.losers, "losers-list", false);
-
-    document.getElementById("gainer-count").textContent = (d.gainers?.length || 0) + " stocks";
-    document.getElementById("loser-count").textContent = (d.losers?.length || 0) + " stocks";
-  } catch(e) {
-    document.getElementById("gainers-list").innerHTML = `<div class="error-msg">⚠ ${e.message}</div>`;
-    document.getElementById("losers-list").innerHTML = `<div class="error-msg">⚠ ${e.message}</div>`;
-  }
+    try {
+        const d = await api("/api/gainers-losers");
+        const renderList = (arr, containerId, isUp) => {
+            const el = document.getElementById(containerId);
+            if (!arr || !arr.length) { el.innerHTML = '<div class="p-4 text-xs text-slate-400">No data available</div>'; return; }
+            el.innerHTML = arr.slice(0, 8).map(s => `
+                <div class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
+                    <div>
+                        <div class="font-bold text-sm text-slate-800">${s.symbol}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">VOL: ${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-sm text-slate-800">₹${fmt(s.ltp)}</div>
+                        <div class="text-[11px] font-bold ${isUp ? 'text-emerald-600' : 'text-rose-600'}">${fmtPct(s.netPrice)}</div>
+                    </div>
+                </div>
+            `).join("");
+        };
+        renderList(d.gainers, "gainers-list", true);
+        renderList(d.losers, "losers-list", false);
+        document.getElementById("gainer-count").textContent = (d.gainers?.length || 0) + " STOCKS";
+        document.getElementById("loser-count").textContent = (d.losers?.length || 0) + " STOCKS";
+    } catch(e) { console.error(e); }
 }
 
-// Most Active
 async function loadMostActive() {
-  try {
-    const d = await api("/api/most-active");
-    const grid = document.getElementById("active-grid");
-    if (!d.data?.length) { grid.innerHTML = '<div class="error-msg">No data</div>'; return; }
-    grid.innerHTML = d.data.map(s => {
-      const up = s.netPrice >= 0;
-      return `<div class="active-tile">
-        <div class="sym">${s.symbol || "—"}</div>
-        <div class="ltp ${up ? 'up-color' : 'down-color'}">₹${fmt(s.ltp)}</div>
-        <div class="chg ${up ? 'up-color' : 'down-color'}">${fmtPct(s.netPrice)}</div>
-      </div>`;
-    }).join("");
-  } catch(e) {
-    document.getElementById("active-grid").innerHTML = `<div class="error-msg">⚠ ${e.message}</div>`;
-  }
+    try {
+        const d = await api("/api/most-active");
+        const grid = document.getElementById("active-grid");
+        if (!d.data?.length) return;
+        grid.innerHTML = d.data.slice(0, 12).map(s => `
+            <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center hover:bg-white hover:shadow-md transition-all cursor-default">
+                <div class="text-[10px] font-bold text-slate-400 mb-1">${s.symbol}</div>
+                <div class="text-sm font-bold text-slate-800">₹${fmt(s.ltp)}</div>
+                <div class="text-[10px] font-bold ${s.netPrice >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${fmtPct(s.netPrice)}</div>
+            </div>
+        `).join("");
+    } catch(e) { console.error(e); }
 }
 
-// Quote lookup
 async function fetchQuote() {
-  const sym = document.getElementById("quote-input").value.trim().toUpperCase();
-  if (!sym) return;
-  const el = document.getElementById("quote-result");
-  el.style.display = "block";
-  el.innerHTML = `<div class="skeleton sk-block"></div>`;
-  try {
-    const d = await api(`/api/quote/${sym}`);
-    const up = d.pChange >= 0;
-    el.innerHTML = `
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px;color:var(--text)">
-        ${d.companyName || d.symbol}
-        <span style="font-size:13px;font-weight:400;color:var(--muted);margin-left:8px">${d.symbol}</span>
-        <span class="stock-change-pill ${up ? 'pill-up' : 'pill-down'}" style="margin-left:10px;font-size:13px">${fmtPct(d.pChange)}</span>
-      </div>
-      <div class="quote-card">
-        <div><div class="quote-item-label">LTP</div><div class="quote-item-val ${up ? 'up-color' : 'down-color'}">₹${fmt(d.lastPrice)}</div></div>
-        <div><div class="quote-item-label">Change</div><div class="quote-item-val ${up ? 'up-color' : 'down-color'}">${up?"+":""}${fmt(d.change)}</div></div>
-        <div><div class="quote-item-label">Open</div><div class="quote-item-val">₹${fmt(d.open)}</div></div>
-        <div><div class="quote-item-label">Prev Close</div><div class="quote-item-val">₹${fmt(d.previousClose)}</div></div>
-        <div><div class="quote-item-label">Day High</div><div class="quote-item-val up-color">₹${fmt(d.high)}</div></div>
-        <div><div class="quote-item-label">Day Low</div><div class="quote-item-val down-color">₹${fmt(d.low)}</div></div>
-        <div><div class="quote-item-label">52W High</div><div class="quote-item-val">₹${fmt(d.weekHighLow?.max)}</div></div>
-        <div><div class="quote-item-label">52W Low</div><div class="quote-item-val">₹${fmt(d.weekHighLow?.min)}</div></div>
-      </div>`;
-  } catch(e) {
-    el.innerHTML = `<div class="error-msg">⚠ ${e.message}. Make sure backend is running and symbol is correct.</div>`;
-  }
+    const sym = document.getElementById("quote-input").value.trim().toUpperCase();
+    if (!sym) return;
+    const el = document.getElementById("quote-result");
+    el.innerHTML = `<div class="w-full h-32 skel-shimmer rounded-2xl"></div>`;
+    try {
+        const d = await api(`/api/quote/${sym}`);
+        const up = d.pChange >= 0;
+        el.innerHTML = `
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h4 class="text-xl font-syne font-extrabold text-slate-800">${d.companyName || d.symbol}</h4>
+                        <p class="text-xs font-mono text-slate-400">${d.symbol} • NSE INDIA</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-syne font-bold ${up ? 'text-emerald-600' : 'text-rose-600'}">₹${fmt(d.lastPrice)}</div>
+                        <div class="text-sm font-bold ${up ? 'text-emerald-600' : 'text-rose-600'}">${fmtPct(d.pChange)} (${up?'+':''}${fmt(d.change)})</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    ${[
+                        ['Open', fmt(d.open)], ['Prev Close', fmt(d.previousClose)],
+                        ['Day High', fmt(d.high), 'text-emerald-600'], ['Day Low', fmt(d.low), 'text-rose-600'],
+                        ['52W High', fmt(d.weekHighLow?.max)], ['52W Low', fmt(d.weekHighLow?.min)]
+                    ].map(item => `
+                        <div class="bg-white p-3 rounded-xl border border-slate-100">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">${item[0]}</div>
+                            <div class="text-sm font-bold ${item[2]||'text-slate-700'}">₹${item[1]}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+    } catch(e) {
+        el.innerHTML = `<div class="p-4 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold border border-rose-100">SYMBOL NOT FOUND OR API OFFLINE</div>`;
+    }
 }
 
-// Load all
 async function loadAll() {
-  const btn = document.getElementById("refresh-btn");
-  btn.classList.add("loading");
-  await Promise.all([
-    loadMarketStatus(),
-    loadIndices(),
-    loadGainersLosers(),
-    loadMostActive(),
-  ]);
-  btn.classList.remove("loading");
+    const btn = document.getElementById("refresh-btn");
+    const icon = document.getElementById("refresh-icon");
+    icon.classList.add("animate-spin-slow");
+    await Promise.all([loadMarketStatus(), loadIndices(), loadGainersLosers(), loadMostActive()]);
+    setTimeout(() => icon.classList.remove("animate-spin-slow"), 800);
 }
 
-// Auto refresh every 30s
 loadAll();
 setInterval(loadAll, 30000);
 </script>
