@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live NSE Tracker</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; text-align: center; }
+        .card { background: #2d2d2d; padding: 20px; border-radius: 10px; display: inline-block; margin-top: 50px; border: 1px solid #444; }
+        .green { color: #4caf50; font-size: 24px; }
+        .red { color: #f44336; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>NSE Market Status</h2>
+        <p id="timestamp">Loading...</p>
+        <div id="content"></div>
+    </div>
+
+    <script>
+        async function loadData() {
+            const response = await fetch('data.json');
+            const result = await response.json();
+            
+            document.getElementById('timestamp').innerText = "Last Update: " + result.last_updated;
+            
+            let html = "";
+            result.data.forEach(item => {
+                html += `<p>${item.index}: <span class="green">↑ ${item.advances}</span> | <span class="red">↓ ${item.declines}</span></p>`;
+            });
+            document.getElementById('content').innerHTML = html;
+        }
+        loadData();
+    </script>
+</body>
+</html>
