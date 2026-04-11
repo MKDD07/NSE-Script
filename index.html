@@ -508,11 +508,26 @@
 // ============================================================
 // CONFIG — change this to your deployed backend URL
 // ============================================================
-const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:5000"
-  : "https://nse-script-z8na.onrender.com"; // <-- REPLACE after deploying to Render
-
+// ⚠️  STEP 1: Replace the URL below with YOUR Render backend URL
+//     e.g.  "https://nse-dashboard-api.onrender.com"
+//     Leave localhost line untouched — it auto-uses it locally.
 // ============================================================
+const RENDER_URL = "https://nse-script-z8na.onrender.com"; // <-- CHANGE THIS LINE
+// ============================================================
+
+const API_BASE = ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ? "http://localhost:5000"
+  : RENDER_URL).replace(/\/+$/, ""); // strips accidental trailing slash
+
+// Show a visible error banner if user forgot to set the URL
+if (API_BASE.includes("YOUR-APP-NAME")) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const banner = document.createElement("div");
+    banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4060;color:#fff;font-family:monospace;font-size:13px;font-weight:600;padding:12px 20px;text-align:center;";
+    banner.innerHTML = "⚠️ &nbsp;<strong>Setup required:</strong> &nbsp; Open <code>index.html</code>, find <code>RENDER_URL</code> and replace <code>YOUR-APP-NAME</code> with your actual Render backend URL. &nbsp;<a href=\"https://render.com\" target=\"_blank\" style=\"color:#fff;text-decoration:underline\">Deploy on Render →</a>";
+    document.body.prepend(banner);
+  });
+}
 
 const fmt = (n) => n != null ? Number(n).toLocaleString("en-IN", {maximumFractionDigits: 2}) : "—";
 const fmtPct = (n) => n != null ? (n > 0 ? "+" : "") + Number(n).toFixed(2) + "%" : "—";
