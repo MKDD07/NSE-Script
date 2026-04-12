@@ -1,0 +1,378 @@
+/* ================================================================
+   NSE Pro Terminal — Minimal White Theme
+   Custom CSS (only what Tailwind cannot do)
+   ================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --green: #059669;
+  --red:   #dc2626;
+  --blue:  #2563eb;
+  --yellow:#d97706;
+  --green-dim: #d1fae5;
+  --red-dim:   #fee2e2;
+  --blue-dim:  #dbeafe;
+  --border:    #e5e7eb;
+}
+
+/* ── Fonts ────────────────────────────────────────────────────── */
+body {
+  font-family: 'Inter', 'Space Grotesk', sans-serif;
+  background: #f9fafb;
+  color: #111827;
+  font-size: 12px;
+  min-height: 100vh;
+}
+
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+/* ── Ticker ───────────────────────────────────────────────────── */
+.ticker-wrap {
+  overflow: hidden;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-inner {
+  display: flex;
+  animation: tick 60s linear infinite;
+  width: max-content;
+  font-size: 11px;
+  gap: 0;
+}
+
+@keyframes tick {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Tab Bar ──────────────────────────────────────────────────── */
+.tab-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+  white-space: nowrap;
+  color: #6b7280;
+  background: transparent;
+  font-family: inherit;
+}
+
+.tab-btn.active {
+  background: #fff;
+  border-color: #e5e7eb;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+.tab-btn:hover:not(.active) {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* ── Cards ────────────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+
+.idx-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: default;
+  transition: border-color .15s, box-shadow .15s;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+.idx-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 6px rgba(0,0,0,.07);
+}
+
+/* ── Card Section Header ──────────────────────────────────────── */
+.card-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ── Data Table ───────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  padding: 7px 12px;
+  text-align: right;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+  background: #f9fafb;
+}
+
+.data-table th:first-child { text-align: left; }
+
+.data-table td {
+  padding: 6px 12px;
+  text-align: right;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 11px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.data-table td:first-child {
+  text-align: left;
+  color: #111827;
+  font-weight: 600;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #f9fafb; }
+
+/* ── Search / Inputs ──────────────────────────────────────────── */
+.search-input {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+}
+
+.search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+.search-input::placeholder { color: #9ca3af; }
+
+/* ── Chip Badges ──────────────────────────────────────────────── */
+.chip-green {
+  background: #d1fae5;
+  color: #059669;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.chip-red {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ── Skeleton loader ──────────────────────────────────────────── */
+.skel {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skel 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skel {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Portfolio Table Row ──────────────────────────────────────── */
+.portfolio-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 80px 90px 80px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background .1s;
+}
+
+.portfolio-row:hover { background: #f9fafb; }
+.portfolio-row:last-child { border-bottom: none; }
+
+/* ── Pulse animation (market dot) ────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .4; }
+}
+
+.pulse { animation: pulse 2s infinite; }
+
+/* ── Utility colour classes used by JS ───────────────────────── */
+.text-green  { color: var(--green); }
+.text-red    { color: var(--red); }
+.text-blue   { color: var(--blue); }
+.text-yellow { color: var(--yellow); }
+.text-muted  { color: #6b7280; }
+.text-faint  { color: #9ca3af; }
+
+/* ── Logo mark ───────────────────────────────────────────────── */
+.logo-mark {
+  background: #2563eb;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Market Badge ────────────────────────────────────────────── */
+.mkt-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* ── Index Pill separator ────────────────────────────────────── */
+.pill-sep { color: #d1d5db; margin: 0 4px; }
+
+/* ── Section label ───────────────────────────────────────────── */
+.section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: #9ca3af;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ── Most Active / Crypto grid cell ─────────────────────────── */
+.grid-cell {
+  background: #fff;
+  padding: 10px 12px;
+  cursor: default;
+  transition: background .1s;
+}
+
+.grid-cell:hover { background: #f9fafb; }
+
+/* ── Option chain ATM row ────────────────────────────────────── */
+.oc-atm td { background: #fffbeb !important; }
+
+/* ── Inline action buttons ───────────────────────────────────── */
+.btn-green {
+  background: #d1fae5;
+  border: 1px solid #059669;
+  color: #059669;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.btn-green:hover { background: #a7f3d0; }
+
+.btn-red {
+  background: #fee2e2;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.btn-red:hover { background: #fecaca; }
+
+.btn-blue {
+  background: #dbeafe;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.btn-blue:hover { background: #bfdbfe; }
+
+.btn-remove {
+  background: #fee2e2;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── Stat mini-card (quote details) ─────────────────────────── */
+.stat-chip {
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-width: 68px;
+}
+
+/* ── Select element ──────────────────────────────────────────── */
+.styled-select {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
