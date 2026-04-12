@@ -606,8 +606,99 @@ async function fetchQuote(){
 // ============================================================
 // SECTORS (built from index data)
 // ============================================================
-const SECTOR_NAMES = ["NIFTY BANK","NIFTY IT","NIFTY PHARMA","NIFTY AUTO","NIFTY FMCG","NIFTY METAL","NIFTY REALTY","NIFTY ENERGY","NIFTY INFRA","NIFTY MEDIA","NIFTY PSU BANK","NIFTY FIN SERVICE","NIFTY HEALTHCARE","NIFTY CONSUMER DURABLES","NIFTY OIL AND GAS"];
 
+      // Broad Market
+      "NIFTY 50",
+      "NIFTY NEXT 50",
+      "NIFTY 100",
+      "NIFTY 200",
+      "NIFTY 500",
+      "NIFTY MIDCAP 50",
+      "NIFTY MIDCAP 100",
+      "NIFTY MIDCAP 150",
+      "NIFTY SMALLCAP 50",
+      "NIFTY SMALLCAP 100",
+      "NIFTY SMALLCAP 250",
+      "NIFTY MIDSMALLCAP 400",
+      "NIFTY MICROCAP 250",
+
+      // Sectoral
+      "NIFTY BANK",
+      "NIFTY IT",
+      "NIFTY PHARMA",
+      "NIFTY AUTO",
+      "NIFTY FMCG",
+      "NIFTY METAL",
+      "NIFTY REALTY",
+      "NIFTY ENERGY",
+      "NIFTY INFRA",
+      "NIFTY MEDIA",
+      "NIFTY PSU BANK",
+      "NIFTY FINANCIAL SERVICES",
+      "NIFTY PRIVATE BANK",
+      "NIFTY HEALTHCARE",
+      "NIFTY CONSUMER DURABLES",
+      "NIFTY OIL & GAS",
+
+      // Thematic / Strategy
+      "NIFTY DIVIDEND OPPORTUNITIES 50",
+      "NIFTY GROWTH SECTORS 15",
+      "NIFTY100 QUALITY 30",
+      "NIFTY100 LOW VOLATILITY 30",
+      "NIFTY100 MOMENTUM 30",
+      "NIFTY ALPHA 50",
+      "NIFTY50 VALUE 20",
+      "NIFTY200 QUALITY 30",
+      "NIFTY200 MOMENTUM 30",
+      "NIFTY200 ALPHA 30",
+      "NIFTY200 LOW VOLATILITY 30",
+
+      // ESG
+      "NIFTY100 ESG",
+      "NIFTY100 ENHANCED ESG",
+
+      // Others
+      "NIFTY COMMODITIES",
+      "NIFTY CPSE",
+      "NIFTY PSE",
+      "NIFTY SERVICES SECTOR",
+      "NIFTY INDIA DIGITAL",
+      "NIFTY INDIA MANUFACTURING",
+      "NIFTY INDIA CONSUMPTION",
+      "NIFTY MNC",
+      "NIFTY SME EMERGE",
+
+      // More Thematic / Strategy / Special
+      "NIFTY HOUSING",
+      "NIFTY CORE HOUSING",
+      "NIFTY CAPITAL MARKETS",
+      "NIFTY TRANSPORTATION & LOGISTICS",
+      "NIFTY INDIA DEFENCE",
+      "NIFTY INDIA TOURISM",
+      "NIFTY INDIA PSU",
+      "NIFTY RURAL",
+      "NIFTY SHARIAH 25",
+      "NIFTY50 SHARIAH",
+      "NIFTY500 SHARIAH",
+
+      // Factor + Smart Beta (extra)
+      "NIFTY ALPHA LOW VOLATILITY 30",
+      "NIFTY QUALITY LOW VOLATILITY 30",
+      "NIFTY MOMENTUM QUALITY 50",
+      "NIFTY500 VALUE 50",
+      "NIFTY500 MULTICAP 50:25:25",
+
+      // Fixed Income / Hybrid style indices (less used but exist)
+      "NIFTY 10 YR BENCHMARK G-SEC",
+      "NIFTY SDL APR 2026 TOP 12",
+      "NIFTY AAA CORPORATE BOND",
+
+      // International / Others
+      "NIFTY GLOBAL BUSINESS",
+      "NIFTY TATA GROUP",
+      "NIFTY ADITYA BIRLA GROUP",
+      "NIFTY MAHINDRA GROUP"
+    ];
 function renderSectors(){
   const sectorData = SECTOR_NAMES.map(name=>indicesData.find(i=>i.name===name)).filter(Boolean);
   const extra = indicesData.filter(i=>i.name.startsWith("NIFTY")&&!SECTOR_NAMES.includes(i.name));
