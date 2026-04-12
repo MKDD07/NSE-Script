@@ -1,1135 +1,1113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>NSE Pro Terminal</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0a0c10;--bg2:#0f1117;--bg3:#161921;--bg4:#1c2030;
-  --border:#ffffff0f;--border2:#ffffff18;
-  --text:#e2e8f0;--text2:#8892a4;--text3:#4a5568;
-  --green:#00d4a8;--red:#ff5470;--yellow:#f5c518;--blue:#4f8ef7;--purple:#a78bfa;--orange:#fb923c;
-  --green-dim:#00d4a820;--red-dim:#ff547020;--blue-dim:#4f8ef720;
-}
-body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;min-height:100vh}
-.mono{font-family:'IBM Plex Mono',monospace}
-.glow-green{box-shadow:0 0 20px #00d4a815}
-.glow-red{box-shadow:0 0 20px #ff547015}
-
-/* Ticker */
-.ticker-wrap{overflow:hidden;background:var(--bg2);border-bottom:1px solid var(--border)}
-.ticker-inner{display:flex;animation:tick 60s linear infinite;width:max-content}
-@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-
-/* Tabs */
-.tab-btn{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:.03em;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;color:var(--text2);background:transparent}
-.tab-btn.active{background:var(--bg4);border-color:var(--border2);color:var(--text)}
-.tab-btn:hover:not(.active){color:var(--text);background:var(--bg3)}
-
-/* Table */
-.data-table{width:100%;border-collapse:collapse}
-.data-table th{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
-.data-table th:first-child{text-align:left}
-.data-table td{padding:5px 10px;text-align:right;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);white-space:nowrap}
-.data-table td:first-child{text-align:left;color:var(--text);font-weight:600}
-.data-table tr:hover td{background:var(--bg3)}
-
-/* Cards */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.idx-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:default;transition:border-color .15s}
-.idx-card:hover{border-color:var(--border2)}
-
-/* Input */
-.search-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;color:var(--text);font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .15s;width:100%}
-.search-input:focus{border-color:var(--blue)}
-.search-input::placeholder{color:var(--text3)}
-
-/* Chips */
-.chip-green{background:var(--green-dim);color:var(--green);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
-.chip-red{background:var(--red-dim);color:var(--red);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-
-/* Skeleton */
-.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:skel 1.4s infinite;border-radius:4px}
-@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* Portfolio */
-.portfolio-row{display:grid;grid-template-columns:1fr 80px 80px 80px 90px 80px;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);transition:background .1s}
-.portfolio-row:hover{background:var(--bg3)}
-
-/* Pulse */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.pulse{animation:pulse 2s infinite}
-
-/* Market status */
-.market-open{color:var(--green)}
-.market-closed{color:var(--red)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>NSE Pro Terminal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- HEADER -->
-<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px">
-  <div style="max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:44px;gap:12px">
-    
-    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-      <div style="background:var(--blue);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">N</div>
-      <span style="font-weight:700;font-size:14px;letter-spacing:-.01em">NSE<span style="color:var(--blue)">Pro</span></span>
-      <div id="mkt-badge" style="display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px">
-        <span id="mkt-dot" class="pulse" style="width:6px;height:6px;border-radius:50%;background:var(--text3)"></span>
-        <span id="mkt-txt" class="mono" style="font-size:10px;font-weight:600;color:var(--text2)">--</span>
-      </div>
-    </div>
+  <!-- ── HEADER ─────────────────────────────────────────────────── -->
+  <header class="bg-white border-b border-gray-200 px-4">
+    <div class="max-w-screen-2xl mx-auto flex items-center justify-between h-11 gap-3">
 
-    <!-- INDEX PILLS -->
-    <div id="idx-pills" style="display:flex;gap:12px;overflow-x:auto;flex:1;align-items:center;scrollbar-width:none"></div>
-
-    <!-- RIGHT -->
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <span id="clock" class="mono" style="font-size:10px;color:var(--text3)"></span>
-      <button onclick="loadAll()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit" id="refresh-btn">⟳ Refresh</button>
-    </div>
-  </div>
-</div>
-
-<!-- TICKER -->
-<div class="ticker-wrap" style="height:28px;display:flex;align-items:center">
-  <div class="ticker-inner" id="ticker" style="font-size:10px;gap:0"></div>
-</div>
-
-<!-- MAIN -->
-<div style="max-width:1600px;margin:0 auto;padding:12px 16px">
-
-  <!-- TABS -->
-  <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none" id="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
-    <button class="tab-btn" onclick="switchTab('indices',this)">Indices</button>
-    <button class="tab-btn" onclick="switchTab('equities',this)">Equities</button>
-    <button class="tab-btn" onclick="switchTab('sectors',this)">Sectors</button>
-    <button class="tab-btn" onclick="switchTab('etf',this)">ETF</button>
-    <button class="tab-btn" onclick="switchTab('mf',this)">Mutual Funds</button>
-    <button class="tab-btn" onclick="switchTab('options',this)">Options / F&O</button>
-    <button class="tab-btn" onclick="switchTab('intl',this)">Global Markets</button>
-    <button class="tab-btn" onclick="switchTab('portfolio',this)">My Portfolio</button>
-    <button class="tab-btn" onclick="switchTab('watchlist',this)">Watchlist</button>
-  </div>
-
-  <!-- ===== OVERVIEW TAB ===== -->
-  <div id="tab-overview">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px" id="overview-indices"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="card">
-        <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;font-weight:600;color:var(--green)">▲ Top Gainers</span>
-          <span id="gain-count" style="font-size:10px;color:var(--text3)">Nifty 50</span>
+      <!-- Logo -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="logo-mark">N</div>
+        <span class="font-bold text-sm tracking-tight text-gray-900">NSE<span class="text-blue-600">Pro</span></span>
+        <div id="mkt-badge" class="mkt-badge">
+          <span id="mkt-dot" class="pulse w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+          <span id="mkt-txt" class="mono text-[10px] font-semibold text-gray-400">--</span>
         </div>
-        <div id="gainers-list"></div>
       </div>
-      <div class="card">
-        <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;font-weight:600;color:var(--red)">▼ Top Losers</span>
-          <span id="lose-count" style="font-size:10px;color:var(--text3)">Nifty 50</span>
+
+      <!-- Index Pills -->
+      <div id="idx-pills" class="flex gap-3 overflow-x-auto flex-1 items-center" style="scrollbar-width:none"></div>
+
+      <!-- Right -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <span id="clock" class="mono text-[10px] text-gray-400"></span>
+        <button onclick="loadAll()" id="refresh-btn"
+          class="tab-btn border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100">⟳ Refresh</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── TICKER ──────────────────────────────────────────────────── -->
+  <div class="ticker-wrap">
+    <div class="ticker-inner" id="ticker"></div>
+  </div>
+
+  <!-- ── MAIN ────────────────────────────────────────────────────── -->
+  <main class="max-w-screen-2xl mx-auto px-4 py-3">
+
+    <!-- TAB BAR -->
+    <div id="tab-bar" class="flex gap-1 overflow-x-auto pb-2.5" style="scrollbar-width:none">
+      <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+      <button class="tab-btn" onclick="switchTab('indices',this)">Indices</button>
+      <button class="tab-btn" onclick="switchTab('equities',this)">Equities</button>
+      <button class="tab-btn" onclick="switchTab('sectors',this)">Sectors</button>
+      <button class="tab-btn" onclick="switchTab('etf',this)">ETF</button>
+      <button class="tab-btn" onclick="switchTab('mf',this)">Mutual Funds</button>
+      <button class="tab-btn" onclick="switchTab('options',this)">Options / F&amp;O</button>
+      <button class="tab-btn" onclick="switchTab('intl',this)">Global Markets</button>
+      <button class="tab-btn" onclick="switchTab('portfolio',this)">My Portfolio</button>
+      <button class="tab-btn" onclick="switchTab('watchlist',this)">Watchlist</button>
+    </div>
+
+    <!-- ===== OVERVIEW TAB ===== -->
+    <div id="tab-overview">
+      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"
+        id="overview-indices"></div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="card">
+          <div class="card-header">
+            <span class="text-green font-semibold text-[11px]">▲ Top Gainers</span>
+            <span id="gain-count" class="text-[10px] text-gray-400">Nifty 50</span>
+          </div>
+          <div id="gainers-list"></div>
         </div>
-        <div id="losers-list"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="text-red font-semibold text-[11px]">▼ Top Losers</span>
+            <span id="lose-count" class="text-[10px] text-gray-400">Nifty 50</span>
+          </div>
+          <div id="losers-list"></div>
+        </div>
+      </div>
+      <div class="card mt-2.5">
+        <div class="card-header"><span>Most Active by Volume</span></div>
+        <div id="most-active-grid" class="grid gap-px bg-gray-100"
+          style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
       </div>
     </div>
-    <div class="card" style="margin-top:10px">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Most Active by Volume</span></div>
-      <div id="most-active-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:var(--border)"></div>
-    </div>
-  </div>
 
-  <!-- ===== INDICES TAB ===== -->
-  <div id="tab-indices" style="display:none">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:12px" id="all-indices-grid"></div>
-    <div class="card">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">All NSE Indices</span></div>
-      <div style="overflow-x:auto">
-        <table class="data-table" id="indices-table">
-          <thead><tr><th style="text-align:left">Index</th><th>Last</th><th>Change</th><th>% Chg</th><th>Open</th><th>High</th><th>Low</th><th>Prev Close</th></tr></thead>
-          <tbody id="indices-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== EQUITIES TAB ===== -->
-  <div id="tab-equities" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
-      <input class="search-input" id="eq-search" placeholder="Search symbol or company..." style="max-width:280px" oninput="filterEquities()">
-      <button class="tab-btn active" onclick="setEqFilter('gainers',this)" id="eq-tab-gainers">Gainers</button>
-      <button class="tab-btn" onclick="setEqFilter('losers',this)" id="eq-tab-losers">Losers</button>
-      <button class="tab-btn" onclick="setEqFilter('active',this)" id="eq-tab-active">Most Active</button>
-      <button class="tab-btn" onclick="fetchQuote()" style="background:var(--blue-dim);color:var(--blue);border-color:var(--blue)">Fetch Quote ↵</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input class="search-input" id="quote-input" placeholder="Enter symbol (e.g. RELIANCE)..." style="max-width:220px" onkeydown="if(event.key==='Enter')fetchQuote()">
-    </div>
-    <div id="quote-result" style="margin-bottom:10px"></div>
-    <div class="card">
-      <div style="overflow-x:auto">
-        <table class="data-table" id="eq-table">
-          <thead><tr><th style="text-align:left">Symbol</th><th>LTP</th><th>Chg%</th><th>Volume</th><th>Prev Close</th><th>52W H</th><th>52W L</th></tr></thead>
-          <tbody id="eq-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== SECTORS TAB ===== -->
-  <div id="tab-sectors" style="display:none">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px" id="sectors-grid"></div>
-    <div class="card">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Sector Performance</span></div>
-      <div style="overflow-x:auto">
-        <table class="data-table">
-          <thead><tr><th style="text-align:left">Sector Index</th><th>Last</th><th>Change</th><th>% Chg</th><th>52W High</th><th>52W Low</th></tr></thead>
-          <tbody id="sector-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== ETF TAB ===== -->
-  <div id="tab-etf" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input class="search-input" id="etf-search" placeholder="Search ETF..." style="max-width:260px" oninput="filterETF()">
-    </div>
-    <div class="card">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)">
-        <span style="font-size:11px;font-weight:600">Exchange Traded Funds (NSE)</span>
-        <span id="etf-count" style="font-size:10px;color:var(--text3);margin-left:8px"></span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="data-table">
-          <thead><tr><th style="text-align:left">Symbol</th><th>Name</th><th>LTP</th><th>Chg%</th><th>Volume</th><th>AUM (Cr)</th></tr></thead>
-          <tbody id="etf-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MUTUAL FUNDS TAB ===== -->
-  <div id="tab-mf" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
-      <input class="search-input" id="mf-search" placeholder="Search fund..." style="max-width:280px" oninput="filterMF()">
-      <button class="tab-btn active" onclick="setMFCat('equity',this)">Equity</button>
-      <button class="tab-btn" onclick="setMFCat('debt',this)">Debt</button>
-      <button class="tab-btn" onclick="setMFCat('hybrid',this)">Hybrid</button>
-      <button class="tab-btn" onclick="setMFCat('index',this)">Index</button>
-    </div>
-    <div class="card">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Listed Mutual Funds (NSE MFSS)</span></div>
-      <div style="overflow-x:auto">
-        <table class="data-table">
-          <thead><tr><th style="text-align:left">Fund Name</th><th>NAV</th><th>1D Ret%</th><th>1Y Ret%</th><th>Category</th><th>AUM (Cr)</th></tr></thead>
-          <tbody id="mf-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== OPTIONS / F&O TAB ===== -->
-  <div id="tab-options" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
-      <input class="search-input" id="fno-sym" placeholder="Underlying (e.g. NIFTY, BANKNIFTY, RELIANCE)..." style="max-width:280px">
-      <button onclick="loadFnO()" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Load Chain</button>
-      <span style="font-size:10px;color:var(--text3)">Expiry:</span>
-      <select id="fno-expiry" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text);font-family:inherit" onchange="renderOC()">
-        <option>Loading...</option>
-      </select>
-    </div>
-    <!-- PCR + OI Stats -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px" id="fno-stats"></div>
-    <!-- Option Chain Table -->
-    <div class="card" style="overflow-x:auto">
-      <table class="data-table" id="oc-table">
-        <thead>
-          <tr style="font-size:10px">
-            <th colspan="5" style="text-align:center;color:var(--green);border-right:2px solid var(--border2)">CALLS</th>
-            <th style="text-align:center;background:var(--bg3)">Strike</th>
-            <th colspan="5" style="text-align:center;color:var(--red)">PUTS</th>
-          </tr>
-          <tr>
-            <th>OI</th><th>Chg OI</th><th>Vol</th><th>IV%</th><th>LTP</th>
-            <th style="background:var(--bg3);color:var(--text)">Strike</th>
-            <th>LTP</th><th>IV%</th><th>Vol</th><th>Chg OI</th><th>OI</th>
-          </tr>
-        </thead>
-        <tbody id="oc-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ===== GLOBAL MARKETS TAB ===== -->
-  <div id="tab-intl" style="display:none">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px" id="global-grid"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <!-- ===== INDICES TAB ===== -->
+    <div id="tab-indices" class="hidden">
+      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))"
+        id="all-indices-grid"></div>
       <div class="card">
-        <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Commodities</span></div>
-        <div id="commodities-list"></div>
+        <div class="card-header"><span>All NSE Indices</span></div>
+        <div class="overflow-x-auto">
+          <table class="data-table" id="indices-table">
+            <thead>
+              <tr>
+                <th class="text-left">Index</th>
+                <th>Last</th>
+                <th>Change</th>
+                <th>% Chg</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Prev Close</th>
+              </tr>
+            </thead>
+            <tbody id="indices-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EQUITIES TAB ===== -->
+    <div id="tab-equities" class="hidden">
+      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
+        <input class="search-input" id="eq-search" placeholder="Search symbol or company..." style="max-width:280px"
+          oninput="filterEquities()">
+        <button class="tab-btn active" onclick="setEqFilter('gainers',this)" id="eq-tab-gainers">Gainers</button>
+        <button class="tab-btn" onclick="setEqFilter('losers',this)" id="eq-tab-losers">Losers</button>
+        <button class="tab-btn" onclick="setEqFilter('active',this)" id="eq-tab-active">Most Active</button>
+        <button onclick="fetchQuote()" class="btn-blue">Fetch Quote ↵</button>
+      </div>
+      <div class="flex gap-2 mb-2.5">
+        <input class="search-input" id="quote-input" placeholder="Enter symbol (e.g. RELIANCE)..."
+          style="max-width:220px" onkeydown="if(event.key==='Enter')fetchQuote()">
+      </div>
+      <div id="quote-result" class="mb-2.5"></div>
+      <div class="card">
+        <div class="overflow-x-auto">
+          <table class="data-table" id="eq-table">
+            <thead>
+              <tr>
+                <th class="text-left">Symbol</th>
+                <th>LTP</th>
+                <th>Chg%</th>
+                <th>Volume</th>
+                <th>Prev Close</th>
+                <th>52W H</th>
+                <th>52W L</th>
+              </tr>
+            </thead>
+            <tbody id="eq-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTORS TAB ===== -->
+    <div id="tab-sectors" class="hidden">
+      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))" id="sectors-grid">
       </div>
       <div class="card">
-        <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Forex (INR)</span></div>
-        <div id="forex-list"></div>
+        <div class="card-header"><span>Sector Performance</span></div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Sector Index</th>
+                <th>Last</th>
+                <th>Change</th>
+                <th>% Chg</th>
+                <th>52W High</th>
+                <th>52W Low</th>
+              </tr>
+            </thead>
+            <tbody id="sector-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-    <div class="card" style="margin-top:10px">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">Crypto (Top 10)</span></div>
-      <div id="crypto-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--border)"></div>
-    </div>
-  </div>
 
-  <!-- ===== PORTFOLIO TAB ===== -->
-  <div id="tab-portfolio" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;font-weight:600">Add Holding</span>
-      <input class="search-input" id="p-sym" placeholder="Symbol" style="width:120px">
-      <input class="search-input" id="p-qty" placeholder="Qty" type="number" style="width:80px">
-      <input class="search-input" id="p-avg" placeholder="Avg Price ₹" type="number" style="width:120px">
-      <input class="search-input" id="p-exc" placeholder="Exchange (OTHER)" style="width:120px">
-      <button onclick="addHolding()" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:6px;padding:6px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">+ Add</button>
-      <button onclick="clearPortfolio()" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Clear All</button>
-    </div>
-    <!-- Summary -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:10px" id="portfolio-summary"></div>
-    <!-- Table -->
-    <div class="card">
-      <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 80px 80px 80px 90px 80px;gap:8px">
-        <span style="font-size:10px;font-weight:700;color:var(--text3)">SYMBOL</span>
-        <span style="font-size:10px;font-weight:700;color:var(--text3);text-align:right">QTY</span>
-        <span style="font-size:10px;font-weight:700;color:var(--text3);text-align:right">AVG</span>
-        <span style="font-size:10px;font-weight:700;color:var(--text3);text-align:right">LTP</span>
-        <span style="font-size:10px;font-weight:700;color:var(--text3);text-align:right">P&L</span>
-        <span style="font-size:10px;font-weight:700;color:var(--text3);text-align:right">ACTION</span>
+    <!-- ===== ETF TAB ===== -->
+    <div id="tab-etf" class="hidden">
+      <div class="flex gap-2 mb-2.5">
+        <input class="search-input" id="etf-search" placeholder="Search ETF..." style="max-width:260px"
+          oninput="filterETF()">
       </div>
-      <div id="portfolio-rows"></div>
+      <div class="card">
+        <div class="card-header">
+          <span>Exchange Traded Funds (NSE)</span>
+          <span id="etf-count" class="text-[10px] text-gray-400"></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Symbol</th>
+                <th>Name</th>
+                <th>LTP</th>
+                <th>Chg%</th>
+                <th>Volume</th>
+                <th>AUM (Cr)</th>
+              </tr>
+            </thead>
+            <tbody id="etf-tbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- ===== WATCHLIST TAB ===== -->
-  <div id="tab-watchlist" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <input class="search-input" id="wl-input" placeholder="Add symbol to watchlist..." style="max-width:220px" onkeydown="if(event.key==='Enter')addToWatchlist()">
-      <button onclick="addToWatchlist()" style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">+ Watch</button>
+    <!-- ===== MUTUAL FUNDS TAB ===== -->
+    <div id="tab-mf" class="hidden">
+      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
+        <input class="search-input" id="mf-search" placeholder="Search fund..." style="max-width:280px"
+          oninput="filterMF()">
+        <button class="tab-btn active" onclick="setMFCat('equity',this)">Equity</button>
+        <button class="tab-btn" onclick="setMFCat('debt',this)">Debt</button>
+        <button class="tab-btn" onclick="setMFCat('hybrid',this)">Hybrid</button>
+        <button class="tab-btn" onclick="setMFCat('index',this)">Index</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>Listed Mutual Funds (NSE MFSS)</span></div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Fund Name</th>
+                <th>NAV</th>
+                <th>1D Ret%</th>
+                <th>1Y Ret%</th>
+                <th>Category</th>
+                <th>AUM (Cr)</th>
+              </tr>
+            </thead>
+            <tbody id="mf-tbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div style="padding:10px 12px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600">My Watchlist</span> <span id="wl-count" style="font-size:10px;color:var(--text3)"></span></div>
-      <div style="overflow-x:auto">
-        <table class="data-table">
-          <thead><tr><th style="text-align:left">Symbol</th><th>LTP</th><th>Chg%</th><th>High</th><th>Low</th><th>Volume</th><th>52W H</th><th>52W L</th><th></th></tr></thead>
-          <tbody id="wl-tbody"></tbody>
+
+    <!-- ===== OPTIONS / F&O TAB ===== -->
+    <div id="tab-options" class="hidden">
+      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
+        <input class="search-input" id="fno-sym" placeholder="Underlying (e.g. NIFTY, BANKNIFTY, RELIANCE)..."
+          style="max-width:280px">
+        <button onclick="loadFnO()" class="btn-blue">Load Chain</button>
+        <span class="text-[10px] text-gray-400">Expiry:</span>
+        <select id="fno-expiry" class="styled-select" onchange="renderOC()">
+          <option>Loading...</option>
+        </select>
+      </div>
+      <!-- PCR + OI Stats -->
+      <div class="grid gap-2 mb-2.5" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))" id="fno-stats">
+      </div>
+      <!-- Option Chain Table -->
+      <div class="card overflow-x-auto">
+        <table class="data-table" id="oc-table">
+          <thead>
+            <tr class="text-[10px]">
+              <th colspan="5" class="text-center text-green border-r-2 border-gray-200">CALLS</th>
+              <th class="text-center bg-gray-50">Strike</th>
+              <th colspan="5" class="text-center text-red">PUTS</th>
+            </tr>
+            <tr>
+              <th>OI</th>
+              <th>Chg OI</th>
+              <th>Vol</th>
+              <th>IV%</th>
+              <th>LTP</th>
+              <th class="bg-gray-50 text-gray-700">Strike</th>
+              <th>LTP</th>
+              <th>IV%</th>
+              <th>Vol</th>
+              <th>Chg OI</th>
+              <th>OI</th>
+            </tr>
+          </thead>
+          <tbody id="oc-tbody"></tbody>
         </table>
       </div>
     </div>
-  </div>
 
-</div><!-- end main -->
+    <!-- ===== GLOBAL MARKETS TAB ===== -->
+    <div id="tab-intl" class="hidden">
+      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))" id="global-grid">
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="card">
+          <div class="card-header"><span>Commodities</span></div>
+          <div id="commodities-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>Forex (INR)</span></div>
+          <div id="forex-list"></div>
+        </div>
+      </div>
+      <div class="card mt-2.5">
+        <div class="card-header"><span>Crypto (Top 10)</span></div>
+        <div id="crypto-grid" class="grid gap-px bg-gray-100"
+          style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))"></div>
+      </div>
+    </div>
 
-<script>
-// ============================================================
-// CONFIG
-// ============================================================
-const RENDER_URL = "https://nse-script-z8na.onrender.com";
-const API_BASE = (window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1"
-  ? "http://localhost:5000" : RENDER_URL).replace(/\/+$/,"");
+    <!-- ===== PORTFOLIO TAB ===== -->
+    <div id="tab-portfolio" class="hidden">
+      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
+        <span class="text-[11px] font-semibold text-gray-700">Add Holding</span>
+        <input class="search-input" id="p-sym" placeholder="Symbol" style="width:120px">
+        <input class="search-input" id="p-qty" placeholder="Qty" type="number" style="width:80px">
+        <input class="search-input" id="p-avg" placeholder="Avg Price ₹" type="number" style="width:120px">
+        <input class="search-input" id="p-exc" placeholder="Exchange (OTHER)" style="width:120px">
+        <button onclick="addHolding()" class="btn-green">+ Add</button>
+        <button onclick="clearPortfolio()" class="btn-red">Clear All</button>
+      </div>
+      <!-- Summary -->
+      <div class="grid gap-2 mb-2.5" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))"
+        id="portfolio-summary"></div>
+      <!-- Table -->
+      <div class="card">
+        <div
+          class="grid gap-2 px-3.5 py-1.5 border-b border-gray-100 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+          style="grid-template-columns:1fr 80px 80px 80px 90px 80px">
+          <span>Symbol</span>
+          <span class="text-right">Qty</span>
+          <span class="text-right">Avg</span>
+          <span class="text-right">LTP</span>
+          <span class="text-right">P&amp;L</span>
+          <span class="text-right">Action</span>
+        </div>
+        <div id="portfolio-rows"></div>
+      </div>
+    </div>
 
-const $ = id => document.getElementById(id);
-const fmt = (n,d=2) => n!=null ? Number(n).toLocaleString("en-IN",{maximumFractionDigits:d}) : "—";
-const pct = n => n!=null ? (n>=0?"+":"")+Number(n).toFixed(2)+"%" : "—";
-const col = n => n>=0 ? "var(--green)" : "var(--red)";
-const chip = n => `<span class="${n>=0?'chip-green':'chip-red'}">${pct(n)}</span>`;
+    <!-- ===== WATCHLIST TAB ===== -->
+    <div id="tab-watchlist" class="hidden">
+      <div class="flex gap-2 mb-2.5 items-center">
+        <input class="search-input" id="wl-input" placeholder="Add symbol to watchlist..." style="max-width:220px"
+          onkeydown="if(event.key==='Enter')addToWatchlist()">
+        <button onclick="addToWatchlist()" class="btn-blue">+ Watch</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span>My Watchlist</span>
+          <span id="wl-count" class="text-[10px] text-gray-400"></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Symbol</th>
+                <th>LTP</th>
+                <th>Chg%</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Volume</th>
+                <th>52W H</th>
+                <th>52W L</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="wl-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-async function api(path){
-  const r = await fetch(API_BASE+path);
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  return r.json();
-}
+  </main><!-- end main -->
 
-// ============================================================
-// STATE
-// ============================================================
-let equitiesData = {gainers:[],losers:[],active:[]};
-let currentEqFilter = "gainers";
-let eqSearchTerm = "";
-let etfData = [];
-let mfData = [];
-let mfCategory = "equity";
-let indicesData = [];
-let ocData = null;
-let portfolio = JSON.parse(localStorage.getItem("nse_portfolio")||"[]");
-let watchlist = JSON.parse(localStorage.getItem("nse_watchlist")||"[]");
-let portfolioLive = {};
-let watchlistLive = {};
-let currentTab = "overview";
+  <script>
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const RENDER_URL = "https://nse-script-z8na.onrender.com";
+    const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:5000" : RENDER_URL).replace(/\/+$/, "");
 
-// ============================================================
-// CLOCK
-// ============================================================
-setInterval(()=>{
-  $("clock").textContent = new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
-},1000);
+    const $ = id => document.getElementById(id);
+    const fmt = (n, d = 2) => n != null ? Number(n).toLocaleString("en-IN", { maximumFractionDigits: d }) : "—";
+    const pct = n => n != null ? (n >= 0 ? "+" : "") + Number(n).toFixed(2) + "%" : "—";
+    const col = n => n >= 0 ? "var(--green)" : "var(--red)";
+    const colCls = n => n >= 0 ? "text-green" : "text-red";
+    const chip = n => `<span class="${n >= 0 ? 'chip-green' : 'chip-red'}">${pct(n)}</span>`;
 
-// ============================================================
-// TAB SWITCH
-// ============================================================
-function switchTab(id, btn){
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  ["overview","indices","equities","sectors","etf","mf","options","intl","portfolio","watchlist"].forEach(t=>{
-    const el = $("tab-"+t);
-    if(el) el.style.display = t===id ? "block" : "none";
-  });
-  currentTab = id;
-  if(id==="portfolio") renderPortfolio();
-  if(id==="watchlist") renderWatchlist();
-  if(id==="etf") renderETFTable();
-  if(id==="mf") renderMFTable();
-  if(id==="sectors") renderSectors();
-  if(id==="indices") renderAllIndices();
-  if(id==="intl") loadGlobal();
-  if(id==="options") { $("fno-sym").value="NIFTY"; loadFnO(); }
-}
-
-// ============================================================
-// MARKET STATUS
-// ============================================================
-async function loadMarketStatus(){
-  try{
-    const d = await api("/api/market-status");
-    const markets = d.data?.marketState||[];
-    const cm = markets.find(m=>m.market==="Capital Market"||m.market==="CM");
-    if(cm){
-      const open = cm.marketStatus==="Open";
-      $("mkt-dot").style.background = open ? "var(--green)" : "var(--red)";
-      $("mkt-txt").textContent = open ? "OPEN" : "CLOSED";
-      $("mkt-txt").style.color = open ? "var(--green)" : "var(--red)";
+    async function api(path) {
+      const r = await fetch(API_BASE + path);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
     }
-  }catch(e){}
-}
 
-// ============================================================
-// INDICES
-// ============================================================
-async function loadIndices(){
-  try{
-    const d = await api("/api/indices");
-    indicesData = d.data||[];
-    renderIndexPills(indicesData);
-    renderTicker(indicesData);
-    renderOverviewIndices(indicesData);
-  }catch(e){}
-}
+    // ============================================================
+    // STATE
+    // ============================================================
+    let equitiesData = { gainers: [], losers: [], active: [] };
+    let currentEqFilter = "gainers";
+    let eqSearchTerm = "";
+    let etfData = [];
+    let mfData = [];
+    let mfCategory = "equity";
+    let indicesData = [];
+    let ocData = null;
+    let portfolio = JSON.parse(localStorage.getItem("nse_portfolio") || "[]");
+    let watchlist = JSON.parse(localStorage.getItem("nse_watchlist") || "[]");
+    let portfolioLive = {};
+    let watchlistLive = {};
+    let currentTab = "overview";
 
-function renderIndexPills(data){
-  const el = $("idx-pills");
-  el.innerHTML = data.slice(0,8).map(i=>{
-    const up=i.pChange>=0;
-    return `<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:default">
-      <span style="font-size:10px;font-weight:600;color:var(--text2)">${i.name}</span>
-      <span class="mono" style="font-size:11px;font-weight:600;color:${col(i.pChange)}">${fmt(i.last)}</span>
-      <span style="font-size:10px;color:${col(i.pChange)}">${pct(i.pChange)}</span>
-    </div>`;
-  }).join('<span style="color:var(--border2);margin:0 4px">|</span>');
-}
+    // ============================================================
+    // CLOCK
+    // ============================================================
+    setInterval(() => {
+      $("clock").textContent = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+    }, 1000);
 
-function renderTicker(data){
-  const all = [...data,...data];
-  $("ticker").innerHTML = all.map(i=>{
-    const up=i.pChange>=0;
-    return `<span style="padding:0 20px;color:var(--text2);display:inline-flex;align-items:center;gap:8px;border-right:1px solid var(--border)">
-      <span style="font-weight:600;color:var(--text)">${i.name}</span>
-      <span class="mono" style="color:${col(i.pChange)}">${fmt(i.last)}</span>
-      <span style="color:${col(i.pChange)};font-size:10px">${pct(i.pChange)}</span>
-    </span>`;
-  }).join("");
-}
+    // ============================================================
+    // TAB SWITCH
+    // ============================================================
+    function switchTab(id, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      ["overview", "indices", "equities", "sectors", "etf", "mf", "options", "intl", "portfolio", "watchlist"].forEach(t => {
+        const el = $("tab-" + t);
+        if (el) el.classList.toggle("hidden", t !== id);
+      });
+      currentTab = id;
+      if (id === "portfolio") renderPortfolio();
+      if (id === "watchlist") renderWatchlist();
+      if (id === "etf") renderETFTable();
+      if (id === "mf") renderMFTable();
+      if (id === "sectors") renderSectors();
+      if (id === "indices") renderAllIndices();
+      if (id === "intl") loadGlobal();
+      if (id === "options") { $("fno-sym").value = "NIFTY"; loadFnO(); }
+    }
 
-function renderOverviewIndices(data){
-  $("overview-indices").innerHTML = data.map(i=>`
-    <div class="idx-card">
-      <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${i.name}</div>
-      <div class="mono" style="font-size:13px;font-weight:600;margin-bottom:3px">₹${fmt(i.last)}</div>
-      <div style="display:flex;gap:6px;align-items:center">
-        ${chip(i.pChange)}
-        <span style="font-size:9px;color:var(--text3)">${i.pChange>=0?"▲":"▼"} ${fmt(Math.abs(i.change))}</span>
-      </div>
-    </div>`).join("");
-}
+    // ============================================================
+    // MARKET STATUS
+    // ============================================================
+    async function loadMarketStatus() {
+      try {
+        const d = await api("/api/market-status");
+        const markets = d.data?.marketState || [];
+        const cm = markets.find(m => m.market === "Capital Market" || m.market === "CM");
+        if (cm) {
+          const open = cm.marketStatus === "Open";
+          $("mkt-dot").style.background = open ? "var(--green)" : "var(--red)";
+          $("mkt-txt").textContent = open ? "OPEN" : "CLOSED";
+          $("mkt-txt").className = `mono text-[10px] font-semibold ${open ? 'text-green' : 'text-red'}`;
+        }
+      } catch (e) { }
+    }
 
-function renderAllIndices(){
-  if(!indicesData.length) return;
-  const grid = $("all-indices-grid");
-  grid.innerHTML = indicesData.map(i=>`
-    <div class="idx-card">
-      <div style="font-size:9px;font-weight:700;letter-spacing:.05em;color:var(--text3);text-transform:uppercase;margin-bottom:3px">${i.name}</div>
-      <div class="mono" style="font-size:13px;font-weight:600;color:${col(i.pChange)}">${fmt(i.last)}</div>
-      <div style="font-size:10px;color:${col(i.pChange)}">${pct(i.pChange)}</div>
-    </div>`).join("");
-  $("indices-tbody").innerHTML = indicesData.map(i=>`
-    <tr>
-      <td>${i.name}</td>
-      <td class="mono">${fmt(i.last)}</td>
-      <td style="color:${col(i.pChange)}" class="mono">${i.change>=0?"+":""}${fmt(i.change)}</td>
-      <td>${chip(i.pChange)}</td>
-      <td class="mono">${fmt(i.open||i.previousClose)}</td>
-      <td class="mono" style="color:var(--green)">${fmt(i.yearHigh||i.high)}</td>
-      <td class="mono" style="color:var(--red)">${fmt(i.yearLow||i.low)}</td>
-      <td class="mono">${fmt(i.previousClose)}</td>
-    </tr>`).join("");
-}
+    // ============================================================
+    // INDICES
+    // ============================================================
+    async function loadIndices() {
+      try {
+        const d = await api("/api/indices");
+        indicesData = d.data || [];
+        renderIndexPills(indicesData);
+        renderTicker(indicesData);
+        renderOverviewIndices(indicesData);
+      } catch (e) { }
+    }
 
-// ============================================================
-// GAINERS / LOSERS
-// ============================================================
-async function loadGainersLosers(){
-  try{
-    const d = await api("/api/gainers-losers");
-    equitiesData.gainers = d.gainers||[];
-    equitiesData.losers = d.losers||[];
-    renderGainerLoserOverview(d.gainers, "gainers-list", true);
-    renderGainerLoserOverview(d.losers, "losers-list", false);
-    $("gain-count").textContent = (d.gainers?.length||0)+" stocks";
-    $("lose-count").textContent = (d.losers?.length||0)+" stocks";
-    renderEqTable();
-  }catch(e){}
-}
-
-function renderGainerLoserOverview(arr, id, up){
-  if(!arr?.length){$(id).innerHTML='<div style="padding:10px;color:var(--text3);font-size:11px">No data</div>';return;}
-  $(id).innerHTML = arr.slice(0,8).map(s=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--border)">
-      <div>
-        <div style="font-size:11px;font-weight:600">${s.symbol}</div>
-        <div class="mono" style="font-size:9px;color:var(--text3)">Vol: ${s.tradedQuantity?Number(s.tradedQuantity).toLocaleString("en-IN"):"—"}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="mono" style="font-size:11px">₹${fmt(s.ltp)}</div>
-        <div style="font-size:10px;color:${up?'var(--green)':'var(--red)'};font-weight:600">${pct(s.netPrice)}</div>
-      </div>
-    </div>`).join("");
-}
-
-// ============================================================
-// MOST ACTIVE
-// ============================================================
-async function loadMostActive(){
-  try{
-    const d = await api("/api/most-active");
-    equitiesData.active = d.data||[];
-    const grid = $("most-active-grid");
-    if(!d.data?.length) return;
-    grid.innerHTML = d.data.slice(0,12).map(s=>`
-      <div style="background:var(--bg2);padding:10px 12px;cursor:default" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background='var(--bg2)'">
-        <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:3px">${s.symbol}</div>
-        <div class="mono" style="font-size:12px;font-weight:600">₹${fmt(s.ltp)}</div>
-        <div style="font-size:10px;color:${col(s.netPrice)};font-weight:600">${pct(s.netPrice)}</div>
-      </div>`).join("");
-  }catch(e){}
-}
-
-// ============================================================
-// EQUITIES TABLE
-// ============================================================
-function setEqFilter(f,btn){
-  currentEqFilter=f;
-  document.querySelectorAll("[id^=eq-tab-]").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  renderEqTable();
-}
-
-function filterEquities(){
-  eqSearchTerm=$("eq-search").value.toLowerCase();
-  renderEqTable();
-}
-
-function renderEqTable(){
-  let data = equitiesData[currentEqFilter==="active"?"active":currentEqFilter]==="gainers"?equitiesData.gainers:
-             currentEqFilter==="losers"?equitiesData.losers:equitiesData.active;
-  if(!data) data=[];
-  if(eqSearchTerm) data=data.filter(s=>(s.symbol||"").toLowerCase().includes(eqSearchTerm));
-  $("eq-tbody").innerHTML = data.map(s=>{
-    const ch=s.netPrice||s.pChange||0;
-    return `<tr>
-      <td>${s.symbol}</td>
-      <td class="mono">₹${fmt(s.ltp||s.lastPrice)}</td>
-      <td>${chip(ch)}</td>
-      <td class="mono" style="color:var(--text2)">${s.tradedQuantity?Number(s.tradedQuantity).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono">₹${fmt(s.previousClose||s.prevClose)}</td>
-      <td class="mono" style="color:var(--green)">₹${fmt(s.yearHigh||s.weekHighLow?.max)}</td>
-      <td class="mono" style="color:var(--red)">₹${fmt(s.yearLow||s.weekHighLow?.min)}</td>
-    </tr>`;
-  }).join("") || `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No data</td></tr>`;
-}
-
-// ============================================================
-// QUOTE FETCH
-// ============================================================
-async function fetchQuote(){
-  const sym=($("quote-input").value||"").trim().toUpperCase();
-  if(!sym) return;
-  const el=$("quote-result");
-  el.innerHTML=`<div class="skel" style="height:32px;width:100%"></div>`;
-  try{
-    const d=await api(`/api/quote/${sym}`);
-    const up=d.pChange>=0;
-    el.innerHTML=`
-      <div class="card" style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:16px;align-items:center">
-        <div style="flex:1;min-width:160px">
-          <div style="font-size:13px;font-weight:700">${d.companyName||d.symbol}</div>
-          <div class="mono" style="font-size:10px;color:var(--text3)">${d.symbol} • NSE</div>
-        </div>
-        <div style="text-align:right">
-          <div class="mono" style="font-size:18px;font-weight:700;color:${col(d.pChange)}">₹${fmt(d.lastPrice)}</div>
-          <div style="font-size:11px;font-weight:600;color:${col(d.pChange)}">${pct(d.pChange)} (${d.change>=0?"+":""}${fmt(d.change)})</div>
-        </div>
-        ${[["Open",d.open],["Prev",d.previousClose],["High",d.high,"var(--green)"],["Low",d.low,"var(--red)"],["52W H",d.weekHighLow?.max,"var(--green)"],["52W L",d.weekHighLow?.min,"var(--red)"]].map(([k,v,c])=>
-          `<div style="background:var(--bg3);border-radius:6px;padding:6px 10px;min-width:70px">
-            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">${k}</div>
-            <div class="mono" style="font-size:11px;font-weight:600;color:${c||'var(--text)'}">₹${fmt(v)}</div>
-          </div>`).join("")}
+    function renderIndexPills(data) {
+      const el = $("idx-pills");
+      el.innerHTML = data.slice(0, 8).map(i => {
+        return `<div class="flex items-center gap-2 flex-shrink-0 cursor-default">
+        <span class="text-[10px] font-semibold text-gray-500">${i.name}</span>
+        <span class="mono text-[11px] font-semibold ${colCls(i.pChange)}">${fmt(i.last)}</span>
+        <span class="text-[10px] ${colCls(i.pChange)}">${pct(i.pChange)}</span>
       </div>`;
-  }catch(e){
-    el.innerHTML=`<div style="background:var(--red-dim);border:1px solid var(--red);border-radius:6px;padding:8px 14px;font-size:11px;color:var(--red)">Symbol not found or API offline</div>`;
-  }
-}
+      }).join('<span class="pill-sep">|</span>');
+    }
 
-// ============================================================
-// SECTORS (built from index data)
-// ============================================================
-const SECTOR_NAMES = [
+    function renderTicker(data) {
+      const all = [...data, ...data];
+      $("ticker").innerHTML = all.map(i => {
+        return `<span class="flex items-center gap-2 px-5 text-gray-500 border-r border-gray-200">
+        <span class="font-semibold text-gray-700">${i.name}</span>
+        <span class="mono ${colCls(i.pChange)}">${fmt(i.last)}</span>
+        <span class="${colCls(i.pChange)} text-[10px]">${pct(i.pChange)}</span>
+      </span>`;
+      }).join("");
+    }
+
+    function renderOverviewIndices(data) {
+      $("overview-indices").innerHTML = data.map(i => `
+      <div class="idx-card">
+        <div class="section-label">${i.name}</div>
+        <div class="mono text-[13px] font-semibold text-gray-900 mb-0.5">₹${fmt(i.last)}</div>
+        <div class="flex gap-1.5 items-center">
+          ${chip(i.pChange)}
+          <span class="text-[9px] text-gray-400">${i.pChange >= 0 ? "▲" : "▼"} ${fmt(Math.abs(i.change))}</span>
+        </div>
+      </div>`).join("");
+    }
+
+    function renderAllIndices() {
+      if (!indicesData.length) return;
+      const grid = $("all-indices-grid");
+      grid.innerHTML = indicesData.map(i => `
+      <div class="idx-card">
+        <div class="section-label">${i.name}</div>
+        <div class="mono text-[13px] font-semibold ${colCls(i.pChange)}">${fmt(i.last)}</div>
+        <div class="text-[10px] ${colCls(i.pChange)}">${pct(i.pChange)}</div>
+      </div>`).join("");
+      $("indices-tbody").innerHTML = indicesData.map(i => `
+      <tr>
+        <td>${i.name}</td>
+        <td class="mono">${fmt(i.last)}</td>
+        <td class="mono ${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
+        <td>${chip(i.pChange)}</td>
+        <td class="mono">${fmt(i.open || i.previousClose)}</td>
+        <td class="mono text-green">${fmt(i.yearHigh || i.high)}</td>
+        <td class="mono text-red">${fmt(i.yearLow || i.low)}</td>
+        <td class="mono">${fmt(i.previousClose)}</td>
+      </tr>`).join("");
+    }
+
+    // ============================================================
+    // GAINERS / LOSERS
+    // ============================================================
+    async function loadGainersLosers() {
+      try {
+        const d = await api("/api/gainers-losers");
+        equitiesData.gainers = d.gainers || [];
+        equitiesData.losers = d.losers || [];
+        renderGainerLoserOverview(d.gainers, "gainers-list", true);
+        renderGainerLoserOverview(d.losers, "losers-list", false);
+        $("gain-count").textContent = (d.gainers?.length || 0) + " stocks";
+        $("lose-count").textContent = (d.losers?.length || 0) + " stocks";
+        renderEqTable();
+      } catch (e) { }
+    }
+
+    function renderGainerLoserOverview(arr, id, up) {
+      if (!arr?.length) { $(id).innerHTML = '<div class="px-3 py-2.5 text-[11px] text-gray-400">No data</div>'; return; }
+      $(id).innerHTML = arr.slice(0, 8).map(s => `
+      <div class="flex justify-between items-center px-3 py-1.5 border-b border-gray-50">
+        <div>
+          <div class="text-[11px] font-semibold text-gray-800">${s.symbol}</div>
+          <div class="mono text-[9px] text-gray-400">Vol: ${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</div>
+        </div>
+        <div class="text-right">
+          <div class="mono text-[11px] text-gray-700">₹${fmt(s.ltp)}</div>
+          <div class="text-[10px] font-semibold ${up ? 'text-green' : 'text-red'}">${pct(s.netPrice)}</div>
+        </div>
+      </div>`).join("");
+    }
+
+    // ============================================================
+    // MOST ACTIVE
+    // ============================================================
+    async function loadMostActive() {
+      try {
+        const d = await api("/api/most-active");
+        equitiesData.active = d.data || [];
+        const grid = $("most-active-grid");
+        if (!d.data?.length) return;
+        grid.innerHTML = d.data.slice(0, 12).map(s => `
+        <div class="grid-cell">
+          <div class="text-[10px] font-bold text-gray-500 mb-0.5">${s.symbol}</div>
+          <div class="mono text-[12px] font-semibold text-gray-800">₹${fmt(s.ltp)}</div>
+          <div class="text-[10px] font-semibold ${colCls(s.netPrice)}">${pct(s.netPrice)}</div>
+        </div>`).join("");
+      } catch (e) { }
+    }
+
+    // ============================================================
+    // EQUITIES TABLE
+    // ============================================================
+    function setEqFilter(f, btn) {
+      currentEqFilter = f;
+      document.querySelectorAll("[id^=eq-tab-]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderEqTable();
+    }
+
+    function filterEquities() {
+      eqSearchTerm = $("eq-search").value.toLowerCase();
+      renderEqTable();
+    }
+
+    function renderEqTable() {
+      let data = equitiesData[currentEqFilter === "active" ? "active" : currentEqFilter] === "gainers" ? equitiesData.gainers :
+        currentEqFilter === "losers" ? equitiesData.losers : equitiesData.active;
+      if (!data) data = [];
+      if (eqSearchTerm) data = data.filter(s => (s.symbol || "").toLowerCase().includes(eqSearchTerm));
+      $("eq-tbody").innerHTML = data.map(s => {
+        const ch = s.netPrice || s.pChange || 0;
+        return `<tr>
+        <td>${s.symbol}</td>
+        <td class="mono">₹${fmt(s.ltp || s.lastPrice)}</td>
+        <td>${chip(ch)}</td>
+        <td class="mono text-gray-500">${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</td>
+        <td class="mono">₹${fmt(s.previousClose || s.prevClose)}</td>
+        <td class="mono text-green">₹${fmt(s.yearHigh || s.weekHighLow?.max)}</td>
+        <td class="mono text-red">₹${fmt(s.yearLow || s.weekHighLow?.min)}</td>
+      </tr>`;
+      }).join("") || `<tr><td colspan="7" class="text-center py-5 text-gray-400">No data</td></tr>`;
+    }
+
+    // ============================================================
+    // QUOTE FETCH
+    // ============================================================
+    async function fetchQuote() {
+      const sym = ($("quote-input").value || "").trim().toUpperCase();
+      if (!sym) return;
+      const el = $("quote-result");
+      el.innerHTML = `<div class="skel h-8 w-full"></div>`;
+      try {
+        const d = await api(`/api/quote/${sym}`);
+        el.innerHTML = `
+        <div class="card px-4 py-3 flex flex-wrap gap-4 items-center">
+          <div class="flex-1 min-w-40">
+            <div class="text-[13px] font-bold text-gray-900">${d.companyName || d.symbol}</div>
+            <div class="mono text-[10px] text-gray-400">${d.symbol} • NSE</div>
+          </div>
+          <div class="text-right">
+            <div class="mono text-lg font-bold ${colCls(d.pChange)}">₹${fmt(d.lastPrice)}</div>
+            <div class="text-[11px] font-semibold ${colCls(d.pChange)}">${pct(d.pChange)} (${d.change >= 0 ? "+" : ""}${fmt(d.change)})</div>
+          </div>
+          ${[["Open", d.open], ["Prev", d.previousClose], ["High", d.high, "text-green"], ["Low", d.low, "text-red"], ["52W H", d.weekHighLow?.max, "text-green"], ["52W L", d.weekHighLow?.min, "text-red"]].map(([k, v, c]) =>
+          `<div class="stat-chip">
+              <div class="text-[9px] text-gray-400 uppercase tracking-widest mb-0.5">${k}</div>
+              <div class="mono text-[11px] font-semibold ${c || 'text-gray-800'}">₹${fmt(v)}</div>
+            </div>`).join("")}
+        </div>`;
+      } catch (e) {
+        el.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-lg px-3.5 py-2 text-[11px] text-red-600">Symbol not found or API offline</div>`;
+      }
+    }
+
+    // ============================================================
+    // SECTORS (built from index data)
+    // ============================================================
+    const SECTOR_NAMES = [
       // Broad Market
-      "NIFTY 50",
-      "NIFTY NEXT 50",
-      "NIFTY 100",
-      "NIFTY 200",
-      "NIFTY 500",
-      "NIFTY MIDCAP 50",
-      "NIFTY MIDCAP 100",
-      "NIFTY MIDCAP 150",
-      "NIFTY SMALLCAP 50",
-      "NIFTY SMALLCAP 100",
-      "NIFTY SMALLCAP 250",
-      "NIFTY MIDSMALLCAP 400",
-      "NIFTY MICROCAP 250",
-
+      "NIFTY 50", "NIFTY NEXT 50", "NIFTY 100", "NIFTY 200", "NIFTY 500",
+      "NIFTY MIDCAP 50", "NIFTY MIDCAP 100", "NIFTY MIDCAP 150",
+      "NIFTY SMALLCAP 50", "NIFTY SMALLCAP 100", "NIFTY SMALLCAP 250",
+      "NIFTY MIDSMALLCAP 400", "NIFTY MICROCAP 250",
       // Sectoral
-      "NIFTY BANK",
-      "NIFTY IT",
-      "NIFTY PHARMA",
-      "NIFTY AUTO",
-      "NIFTY FMCG",
-      "NIFTY METAL",
-      "NIFTY REALTY",
-      "NIFTY ENERGY",
-      "NIFTY INFRA",
-      "NIFTY MEDIA",
-      "NIFTY PSU BANK",
-      "NIFTY FINANCIAL SERVICES",
-      "NIFTY PRIVATE BANK",
-      "NIFTY HEALTHCARE",
-      "NIFTY CONSUMER DURABLES",
+      "NIFTY BANK", "NIFTY IT", "NIFTY PHARMA", "NIFTY AUTO", "NIFTY FMCG",
+      "NIFTY METAL", "NIFTY REALTY", "NIFTY ENERGY", "NIFTY INFRA",
+      "NIFTY MEDIA", "NIFTY PSU BANK", "NIFTY FINANCIAL SERVICES",
+      "NIFTY PRIVATE BANK", "NIFTY HEALTHCARE", "NIFTY CONSUMER DURABLES",
       "NIFTY OIL & GAS",
-
       // Thematic / Strategy
-      "NIFTY DIVIDEND OPPORTUNITIES 50",
-      "NIFTY GROWTH SECTORS 15",
-      "NIFTY100 QUALITY 30",
-      "NIFTY100 LOW VOLATILITY 30",
-      "NIFTY100 MOMENTUM 30",
-      "NIFTY ALPHA 50",
-      "NIFTY50 VALUE 20",
-      "NIFTY200 QUALITY 30",
-      "NIFTY200 MOMENTUM 30",
-      "NIFTY200 ALPHA 30",
+      "NIFTY DIVIDEND OPPORTUNITIES 50", "NIFTY GROWTH SECTORS 15",
+      "NIFTY100 QUALITY 30", "NIFTY100 LOW VOLATILITY 30",
+      "NIFTY100 MOMENTUM 30", "NIFTY ALPHA 50", "NIFTY50 VALUE 20",
+      "NIFTY200 QUALITY 30", "NIFTY200 MOMENTUM 30", "NIFTY200 ALPHA 30",
       "NIFTY200 LOW VOLATILITY 30",
-
       // ESG
-      "NIFTY100 ESG",
-      "NIFTY100 ENHANCED ESG",
-
+      "NIFTY100 ESG", "NIFTY100 ENHANCED ESG",
       // Others
-      "NIFTY COMMODITIES",
-      "NIFTY CPSE",
-      "NIFTY PSE",
-      "NIFTY SERVICES SECTOR",
-      "NIFTY INDIA DIGITAL",
-      "NIFTY INDIA MANUFACTURING",
-      "NIFTY INDIA CONSUMPTION",
-      "NIFTY MNC",
+      "NIFTY COMMODITIES", "NIFTY CPSE", "NIFTY PSE",
+      "NIFTY SERVICES SECTOR", "NIFTY INDIA DIGITAL",
+      "NIFTY INDIA MANUFACTURING", "NIFTY INDIA CONSUMPTION", "NIFTY MNC",
       "NIFTY SME EMERGE",
-
-      // More Thematic / Strategy / Special
-      "NIFTY HOUSING",
-      "NIFTY CORE HOUSING",
-      "NIFTY CAPITAL MARKETS",
-      "NIFTY TRANSPORTATION & LOGISTICS",
-      "NIFTY INDIA DEFENCE",
-      "NIFTY INDIA TOURISM",
-      "NIFTY INDIA PSU",
-      "NIFTY RURAL",
-      "NIFTY SHARIAH 25",
-      "NIFTY50 SHARIAH",
-      "NIFTY500 SHARIAH",
-
-      // Factor + Smart Beta (extra)
-      "NIFTY ALPHA LOW VOLATILITY 30",
-      "NIFTY QUALITY LOW VOLATILITY 30",
-      "NIFTY MOMENTUM QUALITY 50",
-      "NIFTY500 VALUE 50",
+      // More Thematic
+      "NIFTY HOUSING", "NIFTY CORE HOUSING", "NIFTY CAPITAL MARKETS",
+      "NIFTY TRANSPORTATION & LOGISTICS", "NIFTY INDIA DEFENCE",
+      "NIFTY INDIA TOURISM", "NIFTY INDIA PSU", "NIFTY RURAL",
+      "NIFTY SHARIAH 25", "NIFTY50 SHARIAH", "NIFTY500 SHARIAH",
+      // Factor + Smart Beta
+      "NIFTY ALPHA LOW VOLATILITY 30", "NIFTY QUALITY LOW VOLATILITY 30",
+      "NIFTY MOMENTUM QUALITY 50", "NIFTY500 VALUE 50",
       "NIFTY500 MULTICAP 50:25:25",
-
-      // Fixed Income / Hybrid style indices (less used but exist)
-      "NIFTY 10 YR BENCHMARK G-SEC",
-      "NIFTY SDL APR 2026 TOP 12",
+      // Fixed Income
+      "NIFTY 10 YR BENCHMARK G-SEC", "NIFTY SDL APR 2026 TOP 12",
       "NIFTY AAA CORPORATE BOND",
-
-      // International / Others
-      "NIFTY GLOBAL BUSINESS",
-      "NIFTY TATA GROUP",
-      "NIFTY ADITYA BIRLA GROUP",
-      "NIFTY MAHINDRA GROUP"
+      // International / Group
+      "NIFTY GLOBAL BUSINESS", "NIFTY TATA GROUP",
+      "NIFTY ADITYA BIRLA GROUP", "NIFTY MAHINDRA GROUP"
     ];
-function renderSectors(){
-  const sectorData = SECTOR_NAMES.map(name=>indicesData.find(i=>i.name===name)).filter(Boolean);
-  const extra = indicesData.filter(i=>i.name.startsWith("NIFTY")&&!SECTOR_NAMES.includes(i.name));
-  const all = [...sectorData,...extra.slice(0,10)];
-  
-  $("sectors-grid").innerHTML = all.map(i=>`
-    <div class="idx-card">
-      <div style="font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${i.name.replace("NIFTY ","")}</div>
-      <div class="mono" style="font-size:13px;font-weight:600">${fmt(i.last)}</div>
-      <div>${chip(i.pChange)}</div>
-    </div>`).join("");
 
-  $("sector-tbody").innerHTML = all.map(i=>`
-    <tr>
-      <td>${i.name}</td>
-      <td class="mono">${fmt(i.last)}</td>
-      <td class="mono" style="color:${col(i.pChange)}">${i.change>=0?"+":""}${fmt(i.change)}</td>
-      <td>${chip(i.pChange)}</td>
-      <td class="mono" style="color:var(--green)">${fmt(i.yearHigh||i.high)}</td>
-      <td class="mono" style="color:var(--red)">${fmt(i.yearLow||i.low)}</td>
-    </tr>`).join("");
-}
+    function renderSectors() {
+      const sectorData = SECTOR_NAMES.map(name => indicesData.find(i => i.name === name)).filter(Boolean);
+      const extra = indicesData.filter(i => i.name.startsWith("NIFTY") && !SECTOR_NAMES.includes(i.name));
+      const all = [...sectorData, ...extra.slice(0, 10)];
 
-// ============================================================
-// ETF (static list + live quotes attempt)
-// ============================================================
-const ETF_LIST = [
-  {sym:"NIFTYBEES",name:"Nippon India Nifty BeES",aum:"12,340"},
-  {sym:"BANKBEES",name:"Nippon India Bank BeES",aum:"4,210"},
-  {sym:"JUNIORBEES",name:"Nippon India Junior BeES",aum:"2,100"},
-  {sym:"GOLDBEES",name:"Nippon India Gold BeES",aum:"8,900"},
-  {sym:"LIQUIDBEES",name:"Nippon India Liquid BeES",aum:"22,400"},
-  {sym:"ITBEES",name:"Nippon India IT BeES",aum:"980"},
-  {sym:"PHARMABEES",name:"Nippon India Pharma BeES",aum:"540"},
-  {sym:"SETFNIF50",name:"SBI-ETF Nifty 50",aum:"1,500"},
-  {sym:"SETFNN50",name:"SBI-ETF Nifty Next 50",aum:"890"},
-  {sym:"ICICIB22",name:"ICICI Pru Bharat 22 ETF",aum:"19,200"},
-  {sym:"CPSE",name:"CPSE ETF (Govt)",aum:"45,000"},
-  {sym:"UTINIFTETF",name:"UTI Nifty 50 ETF",aum:"2,300"},
-  {sym:"MOM100",name:"Mirae Nifty Midcap 150",aum:"760"},
-  {sym:"SILVERETF",name:"Mirae Silver ETF",aum:"420"},
-  {sym:"AUTOBEES",name:"Mirae Auto ETF",aum:"280"},
-  {sym:"HDFCNIFTY",name:"HDFC Nifty 50 ETF",aum:"3,400"},
-  {sym:"HDFCMID150",name:"HDFC Midcap 150 ETF",aum:"900"},
-  {sym:"NIFTYETF",name:"Kotak Nifty 50 ETF",aum:"1,800"},
-  {sym:"NIFTYBEESITR",name:"Nifty BeES (IDFC)",aum:"300"},
-  {sym:"MAFANG",name:"Mirae FANG+ ETF",aum:"1,200"},
-];
-etfData = ETF_LIST.map(e=>({...e,ltp:null,chg:null,vol:null}));
+      $("sectors-grid").innerHTML = all.map(i => `
+      <div class="idx-card">
+        <div class="section-label">${i.name.replace("NIFTY ", "")}</div>
+        <div class="mono text-[13px] font-semibold text-gray-900">${fmt(i.last)}</div>
+        <div>${chip(i.pChange)}</div>
+      </div>`).join("");
 
-async function loadETFQuotes(){
-  // Try fetching quotes for a few key ETFs from the backend
-  for(let i=0;i<Math.min(5,ETF_LIST.length);i++){
-    try{
-      const d=await api(`/api/quote/${ETF_LIST[i].sym}`);
-      etfData[i].ltp=d.lastPrice;
-      etfData[i].chg=d.pChange;
-      etfData[i].vol=d.totalTradedVolume;
-    }catch(e){}
-  }
-  if(currentTab==="etf") renderETFTable();
-}
+      $("sector-tbody").innerHTML = all.map(i => `
+      <tr>
+        <td>${i.name}</td>
+        <td class="mono">${fmt(i.last)}</td>
+        <td class="mono ${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
+        <td>${chip(i.pChange)}</td>
+        <td class="mono text-green">${fmt(i.yearHigh || i.high)}</td>
+        <td class="mono text-red">${fmt(i.yearLow || i.low)}</td>
+      </tr>`).join("");
+    }
 
-function filterETF(){
-  renderETFTable($("etf-search").value.toLowerCase());
-}
+    // ============================================================
+    // ETF (static list + live quotes attempt)
+    // ============================================================
+    const ETF_LIST = [
+      { sym: "NIFTYBEES", name: "Nippon India Nifty BeES", aum: "12,340" },
+      { sym: "BANKBEES", name: "Nippon India Bank BeES", aum: "4,210" },
+      { sym: "JUNIORBEES", name: "Nippon India Junior BeES", aum: "2,100" },
+      { sym: "GOLDBEES", name: "Nippon India Gold BeES", aum: "8,900" },
+      { sym: "LIQUIDBEES", name: "Nippon India Liquid BeES", aum: "22,400" },
+      { sym: "ITBEES", name: "Nippon India IT BeES", aum: "980" },
+      { sym: "PHARMABEES", name: "Nippon India Pharma BeES", aum: "540" },
+      { sym: "SETFNIF50", name: "SBI-ETF Nifty 50", aum: "1,500" },
+      { sym: "SETFNN50", name: "SBI-ETF Nifty Next 50", aum: "890" },
+      { sym: "ICICIB22", name: "ICICI Pru Bharat 22 ETF", aum: "19,200" },
+      { sym: "CPSE", name: "CPSE ETF (Govt)", aum: "45,000" },
+      { sym: "UTINIFTETF", name: "UTI Nifty 50 ETF", aum: "2,300" },
+      { sym: "MOM100", name: "Mirae Nifty Midcap 150", aum: "760" },
+      { sym: "SILVERETF", name: "Mirae Silver ETF", aum: "420" },
+      { sym: "AUTOBEES", name: "Mirae Auto ETF", aum: "280" },
+      { sym: "HDFCNIFTY", name: "HDFC Nifty 50 ETF", aum: "3,400" },
+      { sym: "HDFCMID150", name: "HDFC Midcap 150 ETF", aum: "900" },
+      { sym: "NIFTYETF", name: "Kotak Nifty 50 ETF", aum: "1,800" },
+      { sym: "NIFTYBEESITR", name: "Nifty BeES (IDFC)", aum: "300" },
+      { sym: "MAFANG", name: "Mirae FANG+ ETF", aum: "1,200" },
+    ];
+    etfData = ETF_LIST.map(e => ({ ...e, ltp: null, chg: null, vol: null }));
 
-function renderETFTable(filter=""){
-  let data = filter ? etfData.filter(e=>e.sym.toLowerCase().includes(filter)||e.name.toLowerCase().includes(filter)) : etfData;
-  $("etf-count").textContent = data.length+" ETFs";
-  $("etf-tbody").innerHTML = data.map(e=>`
-    <tr>
-      <td style="color:var(--blue)">${e.sym}</td>
-      <td style="color:var(--text2);font-size:10px">${e.name}</td>
-      <td class="mono">${e.ltp!=null?"₹"+fmt(e.ltp):'<span style="color:var(--text3)">—</span>'}</td>
-      <td>${e.chg!=null?chip(e.chg):'<span style="color:var(--text3)">—</span>'}</td>
-      <td class="mono" style="color:var(--text2)">${e.vol?Number(e.vol).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="color:var(--text2)">₹${e.aum} Cr</td>
-    </tr>`).join("");
-}
+    async function loadETFQuotes() {
+      for (let i = 0; i < Math.min(5, ETF_LIST.length); i++) {
+        try {
+          const d = await api(`/api/quote/${ETF_LIST[i].sym}`);
+          etfData[i].ltp = d.lastPrice;
+          etfData[i].chg = d.pChange;
+          etfData[i].vol = d.totalTradedVolume;
+        } catch (e) { }
+      }
+      if (currentTab === "etf") renderETFTable();
+    }
 
-// ============================================================
-// MUTUAL FUNDS (static curated list)
-// ============================================================
-const MF_DATA = [
-  {name:"Parag Parikh Flexi Cap Fund",nav:75.23,ret1d:0.42,ret1y:18.3,cat:"equity",aum:"54,200"},
-  {name:"Quant Small Cap Fund",nav:228.45,ret1d:-0.18,ret1y:42.1,cat:"equity",aum:"18,900"},
-  {name:"SBI Small Cap Fund",nav:148.90,ret1d:0.31,ret1y:22.4,cat:"equity",aum:"25,600"},
-  {name:"Mirae Asset Large Cap Fund",nav:105.32,ret1d:0.12,ret1y:14.2,cat:"equity",aum:"38,400"},
-  {name:"HDFC Mid-Cap Opportunities",nav:186.74,ret1d:0.28,ret1y:28.6,cat:"equity",aum:"62,100"},
-  {name:"Axis Bluechip Fund",nav:58.19,ret1d:-0.04,ret1y:11.8,cat:"equity",aum:"31,200"},
-  {name:"Nippon India Growth Fund",nav:3420.15,ret1d:0.45,ret1y:35.2,cat:"equity",aum:"22,800"},
-  {name:"UTI Nifty 50 Index Fund",nav:142.30,ret1d:0.22,ret1y:13.4,cat:"index",aum:"15,700"},
-  {name:"HDFC Index Nifty 50 Fund",nav:618.40,ret1d:0.21,ret1y:13.2,cat:"index",aum:"19,200"},
-  {name:"Navi Nifty 50 Index Fund",nav:16.82,ret1d:0.20,ret1y:13.0,cat:"index",aum:"890"},
-  {name:"ICICI Pru Corporate Bond Fund",nav:28.44,ret1d:0.03,ret1y:7.1,cat:"debt",aum:"22,300"},
-  {name:"HDFC Corporate Bond Fund",nav:31.20,ret1d:0.04,ret1y:7.4,cat:"debt",aum:"28,900"},
-  {name:"SBI Magnum Gilt Fund",nav:68.90,ret1d:0.12,ret1y:8.2,cat:"debt",aum:"4,100"},
-  {name:"Kotak Dynamic Bond Fund",nav:35.18,ret1d:0.05,ret1y:7.8,cat:"debt",aum:"2,800"},
-  {name:"HDFC Balanced Advantage Fund",nav:432.50,ret1d:0.18,ret1y:16.8,cat:"hybrid",aum:"88,500"},
-  {name:"ICICI Pru Balanced Advantage",nav:58.34,ret1d:0.14,ret1y:14.2,cat:"hybrid",aum:"62,000"},
-  {name:"Mirae Asset Hybrid Equity",nav:32.10,ret1d:0.16,ret1y:15.6,cat:"hybrid",aum:"8,200"},
-  {name:"Nippon India Nifty BeES (ETF)",nav:248.30,ret1d:0.21,ret1y:13.1,cat:"index",aum:"12,400"},
-];
-mfData = MF_DATA;
+    function filterETF() {
+      renderETFTable($("etf-search").value.toLowerCase());
+    }
 
-function setMFCat(cat,btn){
-  mfCategory=cat;
-  document.querySelectorAll("#tab-mf .tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  renderMFTable();
-}
+    function renderETFTable(filter = "") {
+      let data = filter ? etfData.filter(e => e.sym.toLowerCase().includes(filter) || e.name.toLowerCase().includes(filter)) : etfData;
+      $("etf-count").textContent = data.length + " ETFs";
+      $("etf-tbody").innerHTML = data.map(e => `
+      <tr>
+        <td class="text-blue">${e.sym}</td>
+        <td class="text-gray-500 text-[10px]">${e.name}</td>
+        <td class="mono">${e.ltp != null ? "₹" + fmt(e.ltp) : '<span class="text-gray-300">—</span>'}</td>
+        <td>${e.chg != null ? chip(e.chg) : '<span class="text-gray-300">—</span>'}</td>
+        <td class="mono text-gray-500">${e.vol ? Number(e.vol).toLocaleString("en-IN") : "—"}</td>
+        <td class="mono text-gray-500">₹${e.aum} Cr</td>
+      </tr>`).join("");
+    }
 
-function filterMF(){
-  renderMFTable($("mf-search").value.toLowerCase());
-}
+    // ============================================================
+    // MUTUAL FUNDS (static curated list)
+    // ============================================================
+    const MF_DATA = [
+      { name: "Parag Parikh Flexi Cap Fund", nav: 75.23, ret1d: 0.42, ret1y: 18.3, cat: "equity", aum: "54,200" },
+      { name: "Quant Small Cap Fund", nav: 228.45, ret1d: -0.18, ret1y: 42.1, cat: "equity", aum: "18,900" },
+      { name: "SBI Small Cap Fund", nav: 148.90, ret1d: 0.31, ret1y: 22.4, cat: "equity", aum: "25,600" },
+      { name: "Mirae Asset Large Cap Fund", nav: 105.32, ret1d: 0.12, ret1y: 14.2, cat: "equity", aum: "38,400" },
+      { name: "HDFC Mid-Cap Opportunities", nav: 186.74, ret1d: 0.28, ret1y: 28.6, cat: "equity", aum: "62,100" },
+      { name: "Axis Bluechip Fund", nav: 58.19, ret1d: -0.04, ret1y: 11.8, cat: "equity", aum: "31,200" },
+      { name: "Nippon India Growth Fund", nav: 3420.15, ret1d: 0.45, ret1y: 35.2, cat: "equity", aum: "22,800" },
+      { name: "UTI Nifty 50 Index Fund", nav: 142.30, ret1d: 0.22, ret1y: 13.4, cat: "index", aum: "15,700" },
+      { name: "HDFC Index Nifty 50 Fund", nav: 618.40, ret1d: 0.21, ret1y: 13.2, cat: "index", aum: "19,200" },
+      { name: "Navi Nifty 50 Index Fund", nav: 16.82, ret1d: 0.20, ret1y: 13.0, cat: "index", aum: "890" },
+      { name: "ICICI Pru Corporate Bond Fund", nav: 28.44, ret1d: 0.03, ret1y: 7.1, cat: "debt", aum: "22,300" },
+      { name: "HDFC Corporate Bond Fund", nav: 31.20, ret1d: 0.04, ret1y: 7.4, cat: "debt", aum: "28,900" },
+      { name: "SBI Magnum Gilt Fund", nav: 68.90, ret1d: 0.12, ret1y: 8.2, cat: "debt", aum: "4,100" },
+      { name: "Kotak Dynamic Bond Fund", nav: 35.18, ret1d: 0.05, ret1y: 7.8, cat: "debt", aum: "2,800" },
+      { name: "HDFC Balanced Advantage Fund", nav: 432.50, ret1d: 0.18, ret1y: 16.8, cat: "hybrid", aum: "88,500" },
+      { name: "ICICI Pru Balanced Advantage", nav: 58.34, ret1d: 0.14, ret1y: 14.2, cat: "hybrid", aum: "62,000" },
+      { name: "Mirae Asset Hybrid Equity", nav: 32.10, ret1d: 0.16, ret1y: 15.6, cat: "hybrid", aum: "8,200" },
+      { name: "Nippon India Nifty BeES (ETF)", nav: 248.30, ret1d: 0.21, ret1y: 13.1, cat: "index", aum: "12,400" },
+    ];
+    mfData = MF_DATA;
 
-function renderMFTable(filter=""){
-  let data = mfData.filter(f=>f.cat===mfCategory||(mfCategory==="all"));
-  if(filter) data=data.filter(f=>f.name.toLowerCase().includes(filter));
-  $("mf-tbody").innerHTML = data.map(f=>`
-    <tr>
-      <td style="font-size:11px;color:var(--text)">${f.name}</td>
-      <td class="mono">₹${fmt(f.nav)}</td>
-      <td>${chip(f.ret1d)}</td>
-      <td style="color:${f.ret1y>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600">${f.ret1y>=0?"+":""}${f.ret1y}%</td>
-      <td><span style="background:var(--bg4);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--text2);text-transform:capitalize">${f.cat}</span></td>
-      <td class="mono" style="color:var(--text2)">₹${f.aum} Cr</td>
-    </tr>`).join("");
-}
+    function setMFCat(cat, btn) {
+      mfCategory = cat;
+      document.querySelectorAll("#tab-mf .tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderMFTable();
+    }
 
-// ============================================================
-// OPTIONS / F&O
-// ============================================================
-async function loadFnO(){
-  const sym = ($("fno-sym").value||"NIFTY").trim().toUpperCase();
-  $("oc-tbody").innerHTML=`<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text3)">Loading option chain...</td></tr>`;
-  $("fno-stats").innerHTML="";
-  try{
-    const d = await api(`/api/option-chain/${sym}`);
-    ocData = d;
-    // Populate expiry
-    const expiries = d.expiries||[];
-    $("fno-expiry").innerHTML = expiries.map(e=>`<option value="${e}">${e}</option>`).join("");
-    renderOC();
-  }catch(e){
-    $("oc-tbody").innerHTML=`<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text3)">Option chain not available or API offline</td></tr>`;
-  }
-}
+    function filterMF() {
+      renderMFTable($("mf-search").value.toLowerCase());
+    }
 
-function renderOC(){
-  if(!ocData) return;
-  const expiry = $("fno-expiry").value;
-  const records = (ocData.data||[]).filter(r=>!expiry||r.expiryDate===expiry);
-  const atm = ocData.underlyingValue||0;
-  
-  // Stats
-  let totalCOI=0,totalPOI=0;
-  records.forEach(r=>{r.CE&&(totalCOI+=r.CE.openInterest||0);r.PE&&(totalPOI+=r.PE.openInterest||0);});
-  const pcr = totalCOI>0?(totalPOI/totalCOI).toFixed(2):"—";
-  $("fno-stats").innerHTML=[
-    ["Underlying",`₹${fmt(atm)}`,"var(--text)"],
-    ["PCR",pcr,parseFloat(pcr)>1?"var(--green)":parseFloat(pcr)<0.8?"var(--red)":"var(--yellow)"],
-    ["Total C-OI",Number(totalCOI).toLocaleString("en-IN"),"var(--text2)"],
-    ["Total P-OI",Number(totalPOI).toLocaleString("en-IN"),"var(--text2)"],
-  ].map(([k,v,c])=>`
-    <div class="card" style="padding:8px 12px">
-      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${k}</div>
-      <div class="mono" style="font-size:13px;font-weight:600;color:${c}">${v}</div>
-    </div>`).join("");
+    function renderMFTable(filter = "") {
+      let data = mfData.filter(f => f.cat === mfCategory || (mfCategory === "all"));
+      if (filter) data = data.filter(f => f.name.toLowerCase().includes(filter));
+      $("mf-tbody").innerHTML = data.map(f => `
+      <tr>
+        <td class="text-[11px]">${f.name}</td>
+        <td class="mono">₹${fmt(f.nav)}</td>
+        <td>${chip(f.ret1d)}</td>
+        <td class="font-semibold text-[11px] ${f.ret1y >= 0 ? 'text-green' : 'text-red'}">${f.ret1y >= 0 ? "+" : ""}${f.ret1y}%</td>
+        <td><span class="bg-gray-100 rounded px-1.5 py-0.5 text-[10px] text-gray-500 capitalize">${f.cat}</span></td>
+        <td class="mono text-gray-500">₹${f.aum} Cr</td>
+      </tr>`).join("");
+    }
 
-  const strikes = [...new Set(records.map(r=>r.strikePrice))].sort((a,b)=>a-b);
-  const maxOI = Math.max(...records.map(r=>Math.max(r.CE?.openInterest||0,r.PE?.openInterest||0)));
-  
-  $("oc-tbody").innerHTML = strikes.map(s=>{
-    const r = records.find(r=>r.strikePrice===s)||{};
-    const ce=r.CE||{}; const pe=r.PE||{};
-    const isATM = Math.abs(s-atm)<(atm*0.005);
-    const bg = isATM?"background:var(--bg4)":"";
-    const ceOIw = maxOI>0?Math.round((ce.openInterest||0)/maxOI*100):0;
-    const peOIw = maxOI>0?Math.round((pe.openInterest||0)/maxOI*100):0;
-    return `<tr style="${bg}">
-      <td class="mono" style="font-size:10px">${ce.openInterest?Number(ce.openInterest).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="font-size:10px;color:${(ce.changeinOpenInterest||0)>=0?'var(--green)':'var(--red)'}">${ce.changeinOpenInterest!=null?(ce.changeinOpenInterest>=0?"+":"")+Number(ce.changeinOpenInterest).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="font-size:10px">${ce.totalTradedVolume?Number(ce.totalTradedVolume).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="font-size:10px;color:var(--yellow)">${ce.impliedVolatility?ce.impliedVolatility.toFixed(1)+"%":"—"}</td>
-      <td class="mono" style="font-size:11px;font-weight:600;color:var(--green)">${ce.lastPrice?"₹"+fmt(ce.lastPrice):"—"}</td>
-      <td class="mono" style="font-size:11px;font-weight:700;${isATM?'color:var(--yellow)':'color:var(--text)'};text-align:center;background:var(--bg3)">${fmt(s,0)}</td>
-      <td class="mono" style="font-size:11px;font-weight:600;color:var(--red)">${pe.lastPrice?"₹"+fmt(pe.lastPrice):"—"}</td>
-      <td class="mono" style="font-size:10px;color:var(--yellow)">${pe.impliedVolatility?pe.impliedVolatility.toFixed(1)+"%":"—"}</td>
-      <td class="mono" style="font-size:10px">${pe.totalTradedVolume?Number(pe.totalTradedVolume).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="font-size:10px;color:${(pe.changeinOpenInterest||0)>=0?'var(--green)':'var(--red)'}">${pe.changeinOpenInterest!=null?(pe.changeinOpenInterest>=0?"+":"")+Number(pe.changeinOpenInterest).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="font-size:10px">${pe.openInterest?Number(pe.openInterest).toLocaleString("en-IN"):"—"}</td>
-    </tr>`;
-  }).join("") || `<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text3)">No data for selected expiry</td></tr>`;
-}
+    // ============================================================
+    // OPTIONS / F&O
+    // ============================================================
+    async function loadFnO() {
+      const sym = ($("fno-sym").value || "NIFTY").trim().toUpperCase();
+      $("oc-tbody").innerHTML = `<tr><td colspan="11" class="text-center py-5 text-gray-400">Loading option chain...</td></tr>`;
+      $("fno-stats").innerHTML = "";
+      try {
+        const d = await api(`/api/option-chain/${sym}`);
+        ocData = d;
+        const expiries = d.expiries || [];
+        $("fno-expiry").innerHTML = expiries.map(e => `<option value="${e}">${e}</option>`).join("");
+        renderOC();
+      } catch (e) {
+        $("oc-tbody").innerHTML = `<tr><td colspan="11" class="text-center py-5 text-gray-400">Option chain not available or API offline</td></tr>`;
+      }
+    }
 
-// ============================================================
-// GLOBAL MARKETS (static data + live via API if possible)
-// ============================================================
-const GLOBAL_STATIC = [
-  {name:"S&P 500",val:5218,chg:0.42,flag:"🇺🇸"},
-  {name:"NASDAQ",val:16340,chg:0.61,flag:"🇺🇸"},
-  {name:"DOW JONES",val:39420,chg:0.18,flag:"🇺🇸"},
-  {name:"FTSE 100",val:8042,chg:-0.22,flag:"🇬🇧"},
-  {name:"DAX",val:18200,chg:0.35,flag:"🇩🇪"},
-  {name:"CAC 40",val:8012,chg:0.28,flag:"🇫🇷"},
-  {name:"Nikkei 225",val:38900,chg:-0.44,flag:"🇯🇵"},
-  {name:"Hang Seng",val:17240,chg:1.12,flag:"🇭🇰"},
-  {name:"Shanghai",val:3100,chg:0.52,flag:"🇨🇳"},
-  {name:"Sensex",val:74200,chg:0.38,flag:"🇮🇳"},
-];
-const COMMODITIES_STATIC = [
-  {name:"Gold (USD/oz)",val:2320,chg:0.28},
-  {name:"Silver (USD/oz)",val:27.4,chg:0.55},
-  {name:"Crude Oil WTI",val:82.4,chg:-0.32},
-  {name:"Brent Crude",val:86.1,chg:-0.18},
-  {name:"Natural Gas",val:1.82,chg:-1.24},
-  {name:"Copper (USD/lb)",val:4.52,chg:0.44},
-];
-const FOREX_STATIC = [
-  {name:"USD/INR",val:83.42,chg:0.04},
-  {name:"EUR/INR",val:89.21,chg:-0.12},
-  {name:"GBP/INR",val:104.8,chg:0.08},
-  {name:"JPY/INR",val:0.548,chg:-0.02},
-  {name:"AUD/INR",val:54.2,chg:0.15},
-  {name:"SGD/INR",val:61.8,chg:0.06},
-];
-const CRYPTO_STATIC = [
-  {name:"Bitcoin",sym:"BTC",val:62400,chg:1.42},
-  {name:"Ethereum",sym:"ETH",val:3140,chg:2.18},
-  {name:"BNB",sym:"BNB",val:562,chg:0.88},
-  {name:"Solana",sym:"SOL",val:142,chg:3.22},
-  {name:"XRP",sym:"XRP",val:0.518,chg:-0.44},
-  {name:"USDT",sym:"USDT",val:1.00,chg:0.01},
-  {name:"DOGE",sym:"DOGE",val:0.142,chg:2.10},
-  {name:"Cardano",sym:"ADA",val:0.44,chg:1.32},
-  {name:"Avax",sym:"AVAX",val:34.2,chg:1.88},
-  {name:"Polygon",sym:"POL",val:0.72,chg:2.44},
-];
+    function renderOC() {
+      if (!ocData) return;
+      const expiry = $("fno-expiry").value;
+      const records = (ocData.data || []).filter(r => !expiry || r.expiryDate === expiry);
+      const atm = ocData.underlyingValue || 0;
 
-function loadGlobal(){
-  $("global-grid").innerHTML = GLOBAL_STATIC.map(i=>`
-    <div class="idx-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase">${i.name}</span>
-        <span style="font-size:12px">${i.flag}</span>
-      </div>
-      <div class="mono" style="font-size:13px;font-weight:600">${Number(i.val).toLocaleString("en-US")}</div>
-      <div>${chip(i.chg)}</div>
-    </div>`).join("");
+      let totalCOI = 0, totalPOI = 0;
+      records.forEach(r => { r.CE && (totalCOI += r.CE.openInterest || 0); r.PE && (totalPOI += r.PE.openInterest || 0); });
+      const pcr = totalCOI > 0 ? (totalPOI / totalCOI).toFixed(2) : "—";
+      const pcrNum = parseFloat(pcr);
 
-  $("commodities-list").innerHTML = COMMODITIES_STATIC.map(c=>`
-    <div style="display:flex;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border)">
-      <span style="font-size:11px;color:var(--text2)">${c.name}</span>
-      <span class="mono" style="font-size:11px">${c.val} ${chip(c.chg)}</span>
-    </div>`).join("");
+      $("fno-stats").innerHTML = [
+        ["Underlying", `₹${fmt(atm)}`, "text-gray-800"],
+        ["PCR", pcr, pcrNum > 1 ? "text-green" : pcrNum < 0.8 ? "text-red" : "text-yellow"],
+        ["Total C-OI", Number(totalCOI).toLocaleString("en-IN"), "text-gray-600"],
+        ["Total P-OI", Number(totalPOI).toLocaleString("en-IN"), "text-gray-600"],
+      ].map(([k, v, c]) => `
+      <div class="card px-3 py-2">
+        <div class="section-label">${k}</div>
+        <div class="mono text-[13px] font-semibold ${c}">${v}</div>
+      </div>`).join("");
 
-  $("forex-list").innerHTML = FOREX_STATIC.map(f=>`
-    <div style="display:flex;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border)">
-      <span style="font-size:11px;color:var(--text2)">${f.name}</span>
-      <span class="mono" style="font-size:11px">${fmt(f.val,3)} ${chip(f.chg)}</span>
-    </div>`).join("");
+      const strikes = [...new Set(records.map(r => r.strikePrice))].sort((a, b) => a - b);
+      const maxOI = Math.max(...records.map(r => Math.max(r.CE?.openInterest || 0, r.PE?.openInterest || 0)));
 
-  $("crypto-grid").innerHTML = CRYPTO_STATIC.map(c=>`
-    <div style="background:var(--bg2);padding:10px 12px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:2px">${c.sym}</div>
-      <div class="mono" style="font-size:11px;font-weight:600">$${Number(c.val).toLocaleString("en-US")}</div>
-      <div style="font-size:10px;color:${col(c.chg)};font-weight:600">${pct(c.chg)}</div>
-    </div>`).join("");
-}
+      $("oc-tbody").innerHTML = strikes.map(s => {
+        const r = records.find(r => r.strikePrice === s) || {};
+        const ce = r.CE || {}; const pe = r.PE || {};
+        const isATM = Math.abs(s - atm) < (atm * 0.005);
+        return `<tr class="${isATM ? 'oc-atm' : ''}">
+          <td class="mono text-[10px]">${ce.openInterest ? Number(ce.openInterest).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-[10px] ${(ce.changeinOpenInterest || 0) >= 0 ? 'text-green' : 'text-red'}">${ce.changeinOpenInterest != null ? (ce.changeinOpenInterest >= 0 ? "+" : "") + Number(ce.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-[10px]">${ce.totalTradedVolume ? Number(ce.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-[10px] text-yellow">${ce.impliedVolatility ? ce.impliedVolatility.toFixed(1) + "%" : "—"}</td>
+          <td class="mono text-[11px] font-semibold text-green">${ce.lastPrice ? "₹" + fmt(ce.lastPrice) : "—"}</td>
+          <td class="mono text-[11px] font-bold text-center bg-gray-50 ${isATM ? 'text-yellow' : 'text-gray-800'}">${fmt(s, 0)}</td>
+          <td class="mono text-[11px] font-semibold text-red">${pe.lastPrice ? "₹" + fmt(pe.lastPrice) : "—"}</td>
+          <td class="mono text-[10px] text-yellow">${pe.impliedVolatility ? pe.impliedVolatility.toFixed(1) + "%" : "—"}</td>
+          <td class="mono text-[10px]">${pe.totalTradedVolume ? Number(pe.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-[10px] ${(pe.changeinOpenInterest || 0) >= 0 ? 'text-green' : 'text-red'}">${pe.changeinOpenInterest != null ? (pe.changeinOpenInterest >= 0 ? "+" : "") + Number(pe.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-[10px]">${pe.openInterest ? Number(pe.openInterest).toLocaleString("en-IN") : "—"}</td>
+        </tr>`;
+      }).join("") || `<tr><td colspan="11" class="text-center py-5 text-gray-400">No data for selected expiry</td></tr>`;
+    }
 
-// ============================================================
-// PORTFOLIO
-// ============================================================
-function addHolding(){
-  const sym=($("p-sym").value||"").trim().toUpperCase();
-  const qty=parseFloat($("p-qty").value||0);
-  const avg=parseFloat($("p-avg").value||0);
-  const exc=($("p-exc").value||"NSE").trim().toUpperCase();
-  if(!sym||!qty||!avg) return alert("Fill all fields");
-  portfolio=portfolio.filter(h=>h.sym!==sym);
-  portfolio.push({sym,qty,avg,exc});
-  savePortfolio();
-  $("p-sym").value=$("p-qty").value=$("p-avg").value=$("p-exc").value="";
-  renderPortfolio();
-  fetchPortfolioLive();
-}
+    // ============================================================
+    // GLOBAL MARKETS (static data)
+    // ============================================================
+    const GLOBAL_STATIC = [
+      { name: "S&P 500", val: 5218, chg: 0.42, flag: "🇺🇸" },
+      { name: "NASDAQ", val: 16340, chg: 0.61, flag: "🇺🇸" },
+      { name: "DOW JONES", val: 39420, chg: 0.18, flag: "🇺🇸" },
+      { name: "FTSE 100", val: 8042, chg: -0.22, flag: "🇬🇧" },
+      { name: "DAX", val: 18200, chg: 0.35, flag: "🇩🇪" },
+      { name: "CAC 40", val: 8012, chg: 0.28, flag: "🇫🇷" },
+      { name: "Nikkei 225", val: 38900, chg: -0.44, flag: "🇯🇵" },
+      { name: "Hang Seng", val: 17240, chg: 1.12, flag: "🇭🇰" },
+      { name: "Shanghai", val: 3100, chg: 0.52, flag: "🇨🇳" },
+      { name: "Sensex", val: 74200, chg: 0.38, flag: "🇮🇳" },
+    ];
+    const COMMODITIES_STATIC = [
+      { name: "Gold (USD/oz)", val: 2320, chg: 0.28 },
+      { name: "Silver (USD/oz)", val: 27.4, chg: 0.55 },
+      { name: "Crude Oil WTI", val: 82.4, chg: -0.32 },
+      { name: "Brent Crude", val: 86.1, chg: -0.18 },
+      { name: "Natural Gas", val: 1.82, chg: -1.24 },
+      { name: "Copper (USD/lb)", val: 4.52, chg: 0.44 },
+    ];
+    const FOREX_STATIC = [
+      { name: "USD/INR", val: 83.42, chg: 0.04 },
+      { name: "EUR/INR", val: 89.21, chg: -0.12 },
+      { name: "GBP/INR", val: 104.8, chg: 0.08 },
+      { name: "JPY/INR", val: 0.548, chg: -0.02 },
+      { name: "AUD/INR", val: 54.2, chg: 0.15 },
+      { name: "SGD/INR", val: 61.8, chg: 0.06 },
+    ];
+    const CRYPTO_STATIC = [
+      { name: "Bitcoin", sym: "BTC", val: 62400, chg: 1.42 },
+      { name: "Ethereum", sym: "ETH", val: 3140, chg: 2.18 },
+      { name: "BNB", sym: "BNB", val: 562, chg: 0.88 },
+      { name: "Solana", sym: "SOL", val: 142, chg: 3.22 },
+      { name: "XRP", sym: "XRP", val: 0.518, chg: -0.44 },
+      { name: "USDT", sym: "USDT", val: 1.00, chg: 0.01 },
+      { name: "DOGE", sym: "DOGE", val: 0.142, chg: 2.10 },
+      { name: "Cardano", sym: "ADA", val: 0.44, chg: 1.32 },
+      { name: "Avax", sym: "AVAX", val: 34.2, chg: 1.88 },
+      { name: "Polygon", sym: "POL", val: 0.72, chg: 2.44 },
+    ];
 
-function removeHolding(sym){
-  portfolio=portfolio.filter(h=>h.sym!==sym);
-  savePortfolio();
-  renderPortfolio();
-}
+    function loadGlobal() {
+      $("global-grid").innerHTML = GLOBAL_STATIC.map(i => `
+      <div class="idx-card">
+        <div class="flex justify-between items-center mb-1">
+          <span class="section-label mb-0">${i.name}</span>
+          <span class="text-xs">${i.flag}</span>
+        </div>
+        <div class="mono text-[13px] font-semibold text-gray-800">${Number(i.val).toLocaleString("en-US")}</div>
+        <div>${chip(i.chg)}</div>
+      </div>`).join("");
 
-function savePortfolio(){
-  localStorage.setItem("nse_portfolio",JSON.stringify(portfolio));
-}
+      $("commodities-list").innerHTML = COMMODITIES_STATIC.map(c => `
+      <div class="flex justify-between px-3.5 py-1.5 border-b border-gray-50">
+        <span class="text-[11px] text-gray-600">${c.name}</span>
+        <span class="mono text-[11px] flex items-center gap-1.5">${c.val} ${chip(c.chg)}</span>
+      </div>`).join("");
 
-async function fetchPortfolioLive(){
-  for(const h of portfolio){
-    try{
-      const d=await api(`/api/quote/${h.sym}`);
-      portfolioLive[h.sym]=d.lastPrice||d.ltp||0;
-    }catch(e){ portfolioLive[h.sym]=null; }
-  }
-  renderPortfolio();
-}
+      $("forex-list").innerHTML = FOREX_STATIC.map(f => `
+      <div class="flex justify-between px-3.5 py-1.5 border-b border-gray-50">
+        <span class="text-[11px] text-gray-600">${f.name}</span>
+        <span class="mono text-[11px] flex items-center gap-1.5">${fmt(f.val, 3)} ${chip(f.chg)}</span>
+      </div>`).join("");
 
-function renderPortfolio(){
-  if(!portfolio.length){
-    $("portfolio-rows").innerHTML=`<div style="padding:24px;text-align:center;color:var(--text3);font-size:11px">No holdings added yet. Add stocks from other platforms with your average price.</div>`;
-    $("portfolio-summary").innerHTML="";
-    return;
-  }
-  let totalInv=0,totalCurr=0;
-  portfolio.forEach(h=>{
-    const ltp=portfolioLive[h.sym];
-    totalInv+=h.qty*h.avg;
-    if(ltp) totalCurr+=h.qty*ltp;
-  });
-  const pnl=totalCurr-totalInv;
-  const pnlPct=totalInv>0?((pnl/totalInv)*100):0;
-  $("portfolio-summary").innerHTML=[
-    ["Invested",`₹${fmt(totalInv)}`,"var(--text)"],
-    ["Current Value",totalCurr>0?`₹${fmt(totalCurr)}`:"Fetching...","var(--text)"],
-    ["Total P&L",totalCurr>0?`${pnl>=0?"+":""}₹${fmt(Math.abs(pnl))}`:"-",col(pnl)],
-    ["Return%",totalCurr>0?`${pnlPct>=0?"+":""}${pnlPct.toFixed(2)}%`:"-",col(pnlPct)],
-    ["Holdings",portfolio.length,"var(--blue)"],
-  ].map(([k,v,c])=>`
-    <div class="card" style="padding:10px 14px">
-      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${k}</div>
-      <div class="mono" style="font-size:14px;font-weight:600;color:${c}">${v}</div>
-    </div>`).join("");
+      $("crypto-grid").innerHTML = CRYPTO_STATIC.map(c => `
+      <div class="grid-cell">
+        <div class="text-[10px] font-bold text-gray-400 mb-0.5">${c.sym}</div>
+        <div class="mono text-[11px] font-semibold text-gray-800">$${Number(c.val).toLocaleString("en-US")}</div>
+        <div class="text-[10px] font-semibold ${colCls(c.chg)}">${pct(c.chg)}</div>
+      </div>`).join("");
+    }
 
-  $("portfolio-rows").innerHTML = portfolio.map(h=>{
-    const ltp=portfolioLive[h.sym];
-    const pnl=ltp!=null?((ltp-h.avg)*h.qty):null;
-    const pnlPct=ltp!=null?(((ltp-h.avg)/h.avg)*100):null;
-    return `<div class="portfolio-row">
-      <div>
-        <div style="font-size:12px;font-weight:700">${h.sym}</div>
-        <div style="font-size:9px;color:var(--text3)">${h.exc} • Qty: ${h.qty}</div>
-      </div>
-      <div class="mono" style="font-size:11px;text-align:right;color:var(--text2)">${h.qty}</div>
-      <div class="mono" style="font-size:11px;text-align:right;color:var(--text2)">₹${fmt(h.avg)}</div>
-      <div class="mono" style="font-size:11px;text-align:right;color:${ltp?'var(--text)':'var(--text3)'}">${ltp?"₹"+fmt(ltp):'<span style="font-size:9px">Fetching…</span>'}</div>
-      <div style="text-align:right">
-        ${pnl!=null?`<div class="mono" style="font-size:11px;font-weight:600;color:${col(pnl)}">${pnl>=0?"+":""}₹${fmt(Math.abs(pnl))}</div>
-        <div style="font-size:10px;color:${col(pnlPct)}">${pnlPct>=0?"+":""}${pnlPct.toFixed(2)}%</div>`:`<span style="font-size:9px;color:var(--text3)">—</span>`}
-      </div>
-      <div style="text-align:right">
-        <button onclick="removeHolding('${h.sym}')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit">✕</button>
-      </div>
-    </div>`;
-  }).join("");
-}
+    // ============================================================
+    // PORTFOLIO
+    // ============================================================
+    function addHolding() {
+      const sym = ($("p-sym").value || "").trim().toUpperCase();
+      const qty = parseFloat($("p-qty").value || 0);
+      const avg = parseFloat($("p-avg").value || 0);
+      const exc = ($("p-exc").value || "NSE").trim().toUpperCase();
+      if (!sym || !qty || !avg) return alert("Fill all fields");
+      portfolio = portfolio.filter(h => h.sym !== sym);
+      portfolio.push({ sym, qty, avg, exc });
+      savePortfolio();
+      $("p-sym").value = $("p-qty").value = $("p-avg").value = $("p-exc").value = "";
+      renderPortfolio();
+      fetchPortfolioLive();
+    }
 
-// ============================================================
-// WATCHLIST
-// ============================================================
-function addToWatchlist(){
-  const sym=($("wl-input").value||"").trim().toUpperCase();
-  if(!sym) return;
-  if(!watchlist.includes(sym)) watchlist.push(sym);
-  localStorage.setItem("nse_watchlist",JSON.stringify(watchlist));
-  $("wl-input").value="";
-  fetchWatchlistLive();
-}
+    function removeHolding(sym) {
+      portfolio = portfolio.filter(h => h.sym !== sym);
+      savePortfolio();
+      renderPortfolio();
+    }
 
-function removeFromWatchlist(sym){
-  watchlist=watchlist.filter(s=>s!==sym);
-  localStorage.setItem("nse_watchlist",JSON.stringify(watchlist));
-  renderWatchlist();
-}
+    function clearPortfolio() {
+      portfolio = [];
+      savePortfolio();
+      renderPortfolio();
+    }
 
-async function fetchWatchlistLive(){
-  for(const sym of watchlist){
-    try{
-      const d=await api(`/api/quote/${sym}`);
-      watchlistLive[sym]=d;
-    }catch(e){}
-  }
-  if(currentTab==="watchlist") renderWatchlist();
-}
+    function savePortfolio() {
+      localStorage.setItem("nse_portfolio", JSON.stringify(portfolio));
+    }
 
-function renderWatchlist(){
-  $("wl-count").textContent = watchlist.length+" symbols";
-  if(!watchlist.length){
-    $("wl-tbody").innerHTML=`<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3)">Watchlist empty. Add symbols above.</td></tr>`;
-    return;
-  }
-  $("wl-tbody").innerHTML = watchlist.map(sym=>{
-    const d=watchlistLive[sym];
-    return `<tr>
-      <td style="color:var(--blue)">${sym}</td>
-      <td class="mono">${d?"₹"+fmt(d.lastPrice):"—"}</td>
-      <td>${d?chip(d.pChange):"—"}</td>
-      <td class="mono" style="color:var(--green)">${d?"₹"+fmt(d.high):"—"}</td>
-      <td class="mono" style="color:var(--red)">${d?"₹"+fmt(d.low):"—"}</td>
-      <td class="mono" style="color:var(--text2)">${d&&d.totalTradedVolume?Number(d.totalTradedVolume).toLocaleString("en-IN"):"—"}</td>
-      <td class="mono" style="color:var(--green)">${d?"₹"+fmt(d.weekHighLow?.max):"—"}</td>
-      <td class="mono" style="color:var(--red)">${d?"₹"+fmt(d.weekHighLow?.min):"—"}</td>
-      <td><button onclick="removeFromWatchlist('${sym}')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit">✕</button></td>
-    </tr>`;
-  }).join("");
-}
+    async function fetchPortfolioLive() {
+      for (const h of portfolio) {
+        try {
+          const d = await api(`/api/quote/${h.sym}`);
+          portfolioLive[h.sym] = d.lastPrice || d.ltp || 0;
+        } catch (e) { portfolioLive[h.sym] = null; }
+      }
+      renderPortfolio();
+    }
 
-// ============================================================
-// LOAD ALL
-// ============================================================
-async function loadAll(){
-  const btn=$("refresh-btn");
-  btn.textContent="⟳ Loading...";
-  btn.style.opacity="0.6";
-  await Promise.all([
-    loadMarketStatus(),
-    loadIndices(),
-    loadGainersLosers(),
-    loadMostActive(),
-  ]);
-  // Refresh live data for open tabs
-  if(portfolio.length) fetchPortfolioLive();
-  if(watchlist.length) fetchWatchlistLive();
-  btn.textContent="⟳ Refresh";
-  btn.style.opacity="1";
-}
+    function renderPortfolio() {
+      if (!portfolio.length) {
+        $("portfolio-rows").innerHTML = `<div class="px-4 py-6 text-center text-[11px] text-gray-400">No holdings added yet. Add stocks from other platforms with your average price.</div>`;
+        $("portfolio-summary").innerHTML = "";
+        return;
+      }
+      let totalInv = 0, totalCurr = 0;
+      portfolio.forEach(h => {
+        const ltp = portfolioLive[h.sym];
+        totalInv += h.qty * h.avg;
+        if (ltp) totalCurr += h.qty * ltp;
+      });
+      const pnl = totalCurr - totalInv;
+      const pnlPct = totalInv > 0 ? ((pnl / totalInv) * 100) : 0;
 
-loadAll();
-loadETFQuotes();
-setInterval(loadAll, 30000);
-</script>
+      $("portfolio-summary").innerHTML = [
+        ["Invested", `₹${fmt(totalInv)}`, "text-gray-800"],
+        ["Current Value", totalCurr > 0 ? `₹${fmt(totalCurr)}` : "Fetching...", "text-gray-800"],
+        ["Total P&L", totalCurr > 0 ? `${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}` : "-", colCls(pnl)],
+        ["Return%", totalCurr > 0 ? `${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%` : "-", colCls(pnlPct)],
+        ["Holdings", portfolio.length, "text-blue"],
+      ].map(([k, v, c]) => `
+      <div class="card px-3.5 py-2.5">
+        <div class="section-label">${k}</div>
+        <div class="mono text-[14px] font-semibold ${c}">${v}</div>
+      </div>`).join("");
+
+      $("portfolio-rows").innerHTML = portfolio.map(h => {
+        const ltp = portfolioLive[h.sym];
+        const pnl = ltp != null ? ((ltp - h.avg) * h.qty) : null;
+        const pnlPct = ltp != null ? (((ltp - h.avg) / h.avg) * 100) : null;
+        return `<div class="portfolio-row">
+          <div>
+            <div class="text-[12px] font-bold text-gray-900">${h.sym}</div>
+            <div class="text-[9px] text-gray-400">${h.exc} • Qty: ${h.qty}</div>
+          </div>
+          <div class="mono text-[11px] text-right text-gray-500">${h.qty}</div>
+          <div class="mono text-[11px] text-right text-gray-500">₹${fmt(h.avg)}</div>
+          <div class="mono text-[11px] text-right ${ltp ? 'text-gray-700' : 'text-gray-300'}">${ltp ? "₹" + fmt(ltp) : '<span class="text-[9px]">Fetching…</span>'}</div>
+          <div class="text-right">
+            ${pnl != null ? `<div class="mono text-[11px] font-semibold ${colCls(pnl)}">${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}</div>
+            <div class="text-[10px] ${colCls(pnlPct)}">${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%</div>` : `<span class="text-[9px] text-gray-300">—</span>`}
+          </div>
+          <div class="text-right">
+            <button onclick="removeHolding('${h.sym}')" class="btn-remove">✕</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    // ============================================================
+    // WATCHLIST
+    // ============================================================
+    function addToWatchlist() {
+      const sym = ($("wl-input").value || "").trim().toUpperCase();
+      if (!sym) return;
+      if (!watchlist.includes(sym)) watchlist.push(sym);
+      localStorage.setItem("nse_watchlist", JSON.stringify(watchlist));
+      $("wl-input").value = "";
+      fetchWatchlistLive();
+    }
+
+    function removeFromWatchlist(sym) {
+      watchlist = watchlist.filter(s => s !== sym);
+      localStorage.setItem("nse_watchlist", JSON.stringify(watchlist));
+      renderWatchlist();
+    }
+
+    async function fetchWatchlistLive() {
+      for (const sym of watchlist) {
+        try {
+          const d = await api(`/api/quote/${sym}`);
+          watchlistLive[sym] = d;
+        } catch (e) { }
+      }
+      if (currentTab === "watchlist") renderWatchlist();
+    }
+
+    function renderWatchlist() {
+      $("wl-count").textContent = watchlist.length + " symbols";
+      if (!watchlist.length) {
+        $("wl-tbody").innerHTML = `<tr><td colspan="9" class="text-center py-5 text-gray-400">Watchlist empty. Add symbols above.</td></tr>`;
+        return;
+      }
+      $("wl-tbody").innerHTML = watchlist.map(sym => {
+        const d = watchlistLive[sym];
+        return `<tr>
+          <td class="text-blue">${sym}</td>
+          <td class="mono">${d ? "₹" + fmt(d.lastPrice) : "—"}</td>
+          <td>${d ? chip(d.pChange) : "—"}</td>
+          <td class="mono text-green">${d ? "₹" + fmt(d.high) : "—"}</td>
+          <td class="mono text-red">${d ? "₹" + fmt(d.low) : "—"}</td>
+          <td class="mono text-gray-500">${d && d.totalTradedVolume ? Number(d.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+          <td class="mono text-green">${d ? "₹" + fmt(d.weekHighLow?.max) : "—"}</td>
+          <td class="mono text-red">${d ? "₹" + fmt(d.weekHighLow?.min) : "—"}</td>
+          <td><button onclick="removeFromWatchlist('${sym}')" class="btn-remove">✕</button></td>
+        </tr>`;
+      }).join("");
+    }
+
+    // ============================================================
+    // LOAD ALL
+    // ============================================================
+    async function loadAll() {
+      const btn = $("refresh-btn");
+      btn.textContent = "⟳ Loading...";
+      btn.style.opacity = "0.5";
+      await Promise.all([
+        loadMarketStatus(),
+        loadIndices(),
+        loadGainersLosers(),
+        loadMostActive(),
+      ]);
+      if (portfolio.length) fetchPortfolioLive();
+      if (watchlist.length) fetchWatchlistLive();
+      btn.textContent = "⟳ Refresh";
+      btn.style.opacity = "1";
+    }
+
+    loadAll();
+    loadETFQuotes();
+    setInterval(loadAll, 30000);
+  </script>
+
 </body>
+
 </html>
