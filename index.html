@@ -5,135 +5,1168 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>NSE Pro Terminal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0a0c0f;
+      --bg2: #0f1217;
+      --bg3: #141820;
+      --bg4: #1a2030;
+      --border: #1e2530;
+      --border2: #252d3a;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #4a5568;
+      --green: #00d97e;
+      --green2: rgba(0, 217, 126, 0.12);
+      --red: #ff4560;
+      --red2: rgba(255, 69, 96, 0.12);
+      --blue: #3b82f6;
+      --blue2: rgba(59, 130, 246, 0.12);
+      --yellow: #f59e0b;
+      --accent: #00d97e;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font: 'Sora', sans-serif;
+    }
+
+    html {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .hdr-inner {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 44px
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text)
+    }
+
+    .logo-text span {
+      color: var(--accent)
+    }
+
+    .mkt-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: var(--bg3)
+    }
+
+    .pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: pulseAnim 2s infinite
+    }
+
+    @keyframes pulseAnim {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    .idx-pills {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      flex: 1;
+      align-items: center;
+      scrollbar-width: none
+    }
+
+    .idx-pills::-webkit-scrollbar {
+      display: none
+    }
+
+    .idx-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      cursor: default
+    }
+
+    .idx-pill-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      font-family: var(--font-mono)
+    }
+
+    .idx-pill-val {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .idx-pill-chg {
+      font-size: 10px;
+      font-family: var(--font-mono)
+    }
+
+    .pill-sep {
+      color: var(--border2);
+      flex-shrink: 0
+    }
+
+    .clock {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text3)
+    }
+
+    .btn-refresh {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .btn-refresh:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      height: 26px;
+      display: flex;
+      align-items: center
+    }
+
+    .ticker-track {
+      display: flex;
+      animation: scroll 60s linear infinite;
+      white-space: nowrap
+    }
+
+    .ticker-track:hover {
+      animation-play-state: paused
+    }
+
+    @keyframes scroll {
+      0% {
+        transform: translateX(0)
+      }
+
+      100% {
+        transform: translateX(-50%)
+      }
+    }
+
+    .tick-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 10px
+    }
+
+    .tick-name {
+      color: var(--text2);
+      font-weight: 600
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 12px 16px
+    }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scrollbar-width: none;
+      flex-wrap: nowrap
+    }
+
+    .tab-bar::-webkit-scrollbar {
+      display: none
+    }
+
+    .tab-btn {
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text3);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text2);
+      background: var(--bg3)
+    }
+
+    .tab-btn.active {
+      background: var(--bg4);
+      border-color: var(--border2);
+      color: var(--text)
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    .card-header span:first-child {
+      color: var(--text)
+    }
+
+    /* ── DATA TABLE ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px
+    }
+
+    .data-table th {
+      padding: 7px 12px;
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+      white-space: nowrap;
+    }
+
+    .data-table th:first-child {
+      text-align: left
+    }
+
+    .data-table td {
+      padding: 6px 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .data-table td:first-child {
+      text-align: left
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg3)
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none
+    }
+
+    /* ── CHIPS ── */
+    .chip {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: var(--font-mono)
+    }
+
+    .chip-g {
+      background: var(--green2);
+      color: var(--green)
+    }
+
+    .chip-r {
+      background: var(--red2);
+      color: var(--red)
+    }
+
+    .chip-b {
+      background: var(--blue2);
+      color: var(--blue)
+    }
+
+    .chip-y {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--yellow)
+    }
+
+    /* ── COLORS ── */
+    .g {
+      color: var(--green)
+    }
+
+    .r {
+      color: var(--red)
+    }
+
+    .b {
+      color: var(--blue)
+    }
+
+    .y {
+      color: var(--yellow)
+    }
+
+    .muted {
+      color: var(--text3)
+    }
+
+    .mono {
+      font-family: var(--font-mono)
+    }
+
+    /* ── INDEX CARD / HEATMAP ── */
+    .idx-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: default;
+      transition: border-color .15s;
+    }
+
+    .idx-card:hover {
+      border-color: var(--border2)
+    }
+
+    .idx-card-name {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .idx-card-val {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px
+    }
+
+    .idx-card-bottom {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    /* ── GL ROW ── */
+    .gl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+
+    .gl-row:hover {
+      background: var(--bg3)
+    }
+
+    .gl-row:last-child {
+      border-bottom: none
+    }
+
+    .gl-sym {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .gl-vol {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text3);
+      margin-top: 1px
+    }
+
+    .gl-ltp {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text);
+      text-align: right
+    }
+
+    .gl-chg {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-align: right;
+      margin-top: 1px
+    }
+
+    /* ── GRID CELL (most active) ── */
+    .grid-cell {
+      background: var(--bg2);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px
+    }
+
+    .grid-cell-sym {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      margin-bottom: 3px;
+      font-family: var(--font-mono)
+    }
+
+    .grid-cell-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px
+    }
+
+    /* ── SEARCH / INPUT ── */
+    .inp {
+      padding: 6px 11px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 11px;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .inp:focus {
+      border-color: var(--accent)
+    }
+
+    .inp::placeholder {
+      color: var(--text3)
+    }
+
+    select.inp {
+      cursor: pointer
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: none;
+      font-size: 11px;
+      font-family: var(--font);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all .15s
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      color: #fff
+    }
+
+    .btn-blue:hover {
+      opacity: .85
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #000
+    }
+
+    .btn-green:hover {
+      opacity: .85
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #fff
+    }
+
+    .btn-red:hover {
+      opacity: .85
+    }
+
+    .btn-ghost {
+      background: var(--bg3);
+      color: var(--text2);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .btn-remove {
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text3);
+      font-size: 10px;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .btn-remove:hover {
+      background: var(--red2);
+      color: var(--red);
+      border-color: var(--red)
+    }
+
+    /* ── STAT CHIP ── */
+    .stat-chip {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      min-width: 90px
+    }
+
+    .stat-label {
+      font-size: 9px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 3px
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    /* ── SKELETON ── */
+    .skel {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    /* ── PORTFOLIO ── */
+    .p-row {
+      display: grid;
+      grid-template-columns: 1fr 70px 80px 80px 100px 60px;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .p-row:hover {
+      background: var(--bg3)
+    }
+
+    .p-row:last-child {
+      border-bottom: none
+    }
+
+    /* ── OC TABLE ── */
+    .oc-atm td {
+      background: rgba(245, 158, 11, 0.06) !important
+    }
+
+    .oc-atm .strike-cell {
+      color: var(--yellow) !important;
+      font-weight: 700 !important
+    }
+
+    /* ── OPTION CHAIN ── */
+    #oc-table th {
+      padding: 5px 8px
+    }
+
+    #oc-table td {
+      padding: 5px 8px;
+      font-size: 10px
+    }
+
+    /* ── PREOPEN BAR ── */
+    .po-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .po-row:hover {
+      background: var(--bg3)
+    }
+
+    .po-row:last-child {
+      border-bottom: none
+    }
+
+    /* ── EVENT ROW ── */
+    .ev-row {
+      display: flex;
+      gap: 12px;
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start
+    }
+
+    .ev-row:last-child {
+      border-bottom: none
+    }
+
+    .ev-row:hover {
+      background: var(--bg3)
+    }
+
+    .ev-date {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text3);
+      white-space: nowrap;
+      min-width: 80px
+    }
+
+    .ev-sym {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 80px
+    }
+
+    .ev-purpose {
+      font-size: 11px;
+      color: var(--text2);
+      flex: 1
+    }
+
+    /* ── HIDDEN ── */
+    .hidden {
+      display: none !important
+    }
+
+    /* ── FLEX / GRID UTILS ── */
+    .flex {
+      display: flex
+    }
+
+    .flex-col {
+      flex-direction: column
+    }
+
+    .items-center {
+      align-items: center
+    }
+
+    .justify-between {
+      justify-content: space-between
+    }
+
+    .gap-1 {
+      gap: 4px
+    }
+
+    .gap-2 {
+      gap: 8px
+    }
+
+    .gap-3 {
+      gap: 12px
+    }
+
+    .flex-1 {
+      flex: 1
+    }
+
+    .flex-wrap {
+      flex-wrap: wrap
+    }
+
+    .flex-shrink-0 {
+      flex-shrink: 0
+    }
+
+    .grid {
+      display: grid
+    }
+
+    .mb-1 {
+      margin-bottom: 4px
+    }
+
+    .mb-2 {
+      margin-bottom: 8px
+    }
+
+    .mb-3 {
+      margin-bottom: 12px
+    }
+
+    .mt-2 {
+      margin-top: 8px
+    }
+
+    .mt-3 {
+      margin-top: 12px
+    }
+
+    .p-2 {
+      padding: 8px
+    }
+
+    .p-3 {
+      padding: 12px
+    }
+
+    .px-3 {
+      padding-left: 12px;
+      padding-right: 12px
+    }
+
+    .py-2 {
+      padding-top: 8px;
+      padding-bottom: 8px
+    }
+
+    .overflow-x-auto {
+      overflow-x: auto
+    }
+
+    .overflow-y-auto {
+      overflow-y: auto
+    }
+
+    .text-center {
+      text-align: center
+    }
+
+    .text-right {
+      text-align: right
+    }
+
+    .text-left {
+      text-align: left
+    }
+
+    .font-bold {
+      font-weight: 700
+    }
+
+    .font-semibold {
+      font-weight: 600
+    }
+
+    .uppercase {
+      text-transform: uppercase
+    }
+
+    .tracking-wide {
+      letter-spacing: .06em
+    }
+
+    .rounded {
+      border-radius: 6px
+    }
+
+    .w-full {
+      width: 100%
+    }
+
+    .border-r {
+      border-right: 1px solid var(--border)
+    }
+
+    /* ── SUB-TABS ── */
+    .sub-tabs {
+      display: flex;
+      gap: 2px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap
+    }
+
+    .sub-tabs::-webkit-scrollbar {
+      display: none
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- ── HEADER ─────────────────────────────────────────────────── -->
-  <header class="bg-white border-b border-gray-200 px-4">
-    <div class="max-w-screen-2xl mx-auto flex items-center justify-between h-11 gap-3">
-
-      <!-- Logo -->
-      <div class="flex items-center gap-2 flex-shrink-0">
+  <!-- HEADER -->
+  <header>
+    <div class="hdr-inner">
+      <div class="logo">
         <div class="logo-mark">N</div>
-        <span class="font-bold text-sm tracking-tight text-gray-900">NSE<span class="text-blue-600">Pro</span></span>
-        <div id="mkt-badge" class="mkt-badge">
-          <span id="mkt-dot" class="pulse w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-          <span id="mkt-txt" class="mono text-[10px] font-semibold text-gray-400">--</span>
+        <span class="logo-text">NSE<span>Pro</span></span>
+        <div class="mkt-badge">
+          <span id="mkt-dot" class="pulse" style="background:var(--text3)"></span>
+          <span id="mkt-txt" class="mono" style="font-size:10px;font-weight:600;color:var(--text3)">--</span>
         </div>
       </div>
-
-      <!-- Index Pills -->
-      <div id="idx-pills" class="flex gap-3 overflow-x-auto flex-1 items-center" style="scrollbar-width:none"></div>
-
-      <!-- Right -->
+      <div id="idx-pills" class="idx-pills"></div>
       <div class="flex items-center gap-2 flex-shrink-0">
-        <span id="clock" class="mono text-[10px] text-gray-400"></span>
-        <button onclick="loadAll()" id="refresh-btn"
-          class="tab-btn border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100">⟳ Refresh</button>
+        <span id="clock" class="clock"></span>
+        <button onclick="loadAll()" id="btn-refresh" class="btn-refresh">⟳ Refresh</button>
       </div>
     </div>
   </header>
 
-  <!-- ── TICKER ──────────────────────────────────────────────────── -->
+  <!-- TICKER -->
   <div class="ticker-wrap">
-    <div class="ticker-inner" id="ticker"></div>
+    <div class="ticker-track" id="ticker-track"></div>
   </div>
 
-  <!-- ── MAIN ────────────────────────────────────────────────────── -->
-  <main class="max-w-screen-2xl mx-auto px-4 py-3">
+  <!-- MAIN -->
+  <main>
 
     <!-- TAB BAR -->
-    <div id="tab-bar" class="flex gap-1 overflow-x-auto pb-2.5" style="scrollbar-width:none">
+    <div class="tab-bar" id="main-tabs">
       <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+      <button class="tab-btn" onclick="switchTab('preopen',this)">Pre-Open</button>
       <button class="tab-btn" onclick="switchTab('indices',this)">Indices</button>
       <button class="tab-btn" onclick="switchTab('equities',this)">Equities</button>
       <button class="tab-btn" onclick="switchTab('sectors',this)">Sectors</button>
-      <button class="tab-btn" onclick="switchTab('etf',this)">ETF</button>
-      <button class="tab-btn" onclick="switchTab('mf',this)">Mutual Funds</button>
       <button class="tab-btn" onclick="switchTab('options',this)">Options / F&amp;O</button>
-      <button class="tab-btn" onclick="switchTab('intl',this)">Global Markets</button>
-      <button class="tab-btn" onclick="switchTab('portfolio',this)">My Portfolio</button>
+      <button class="tab-btn" onclick="switchTab('fii',this)">FII / DII</button>
+      <button class="tab-btn" onclick="switchTab('events',this)">Events</button>
+      <button class="tab-btn" onclick="switchTab('deals',this)">Deals</button>
+      <button class="tab-btn" onclick="switchTab('history',this)">History</button>
+      <button class="tab-btn" onclick="switchTab('global',this)">Global</button>
+      <button class="tab-btn" onclick="switchTab('portfolio',this)">Portfolio</button>
       <button class="tab-btn" onclick="switchTab('watchlist',this)">Watchlist</button>
     </div>
 
-    <!-- ===== OVERVIEW TAB ===== -->
+    <!-- ===== OVERVIEW ===== -->
     <div id="tab-overview">
-      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"
-        id="overview-indices"></div>
-      <div class="grid grid-cols-2 gap-2.5">
-        <div class="card">
-          <div class="card-header">
-            <span class="text-green font-semibold text-[11px]">▲ Top Gainers</span>
-            <span id="gain-count" class="text-[10px] text-gray-400">Nifty 50</span>
-          </div>
-          <div id="gainers-list"></div>
+      <!-- Heatmap -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <span>Index Heatmap</span>
+          <span id="hm-count" class="muted" style="font-size:10px"></span>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <span class="text-red font-semibold text-[11px]">▼ Top Losers</span>
-            <span id="lose-count" class="text-[10px] text-gray-400">Nifty 50</span>
+        <div class="sub-tabs" id="hm-tabs">
+          <button class="tab-btn active" onclick="switchHeatmap('broad',this)">Broad Market</button>
+          <button class="tab-btn" onclick="switchHeatmap('sectoral',this)">Sectoral</button>
+          <button class="tab-btn" onclick="switchHeatmap('thematic',this)">Thematic</button>
+          <button class="tab-btn" onclick="switchHeatmap('strategy',this)">Strategy</button>
+          <button class="tab-btn" onclick="switchHeatmap('esg',this)">ESG</button>
+          <button class="tab-btn" onclick="switchHeatmap('fixedincome',this)">Fixed Income</button>
+          <button class="tab-btn" onclick="switchHeatmap('all',this)">All</button>
+        </div>
+        <div id="heatmap-grid" class="p-3 grid"
+          style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px"></div>
+      </div>
+
+      <!-- Gainers / Losers -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <div class="sub-tabs" id="gl-tabs" style="border:none;padding:0">
+            <button class="tab-btn active" onclick="switchGLTab('NIFTY 50',this)">Nifty 50</button>
+            <button class="tab-btn" onclick="switchGLTab('NIFTY 500',this)">Nifty 500</button>
+            <button class="tab-btn" onclick="switchGLTab('NIFTY MIDCAP 100',this)">Midcap 100</button>
+            <button class="tab-btn" onclick="switchGLTab('NIFTY SMALLCAP 100',this)">Smallcap 100</button>
           </div>
-          <div id="losers-list"></div>
+          <span id="gl-count" class="muted" style="font-size:10px;flex-shrink:0"></span>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="border-r">
+            <div
+              style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--green)">
+              ▲ Top Gainers</div>
+            <div id="gainers-list" style="max-height:380px;overflow-y:auto"></div>
+          </div>
+          <div>
+            <div
+              style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--red)">
+              ▼ Top Losers</div>
+            <div id="losers-list" style="max-height:380px;overflow-y:auto"></div>
+          </div>
         </div>
       </div>
-      <div class="card mt-2.5">
+
+      <!-- Sector GL -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <span>Sector Gainers &amp; Losers</span>
+          <span id="sector-gl-count" class="muted" style="font-size:10px"></span>
+        </div>
+        <div class="sub-tabs" id="sector-gl-tabs">
+          <button class="tab-btn active" onclick="switchSectorGL('NIFTY BANK',this)">Bank</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY IT',this)">IT</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY PHARMA',this)">Pharma</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY AUTO',this)">Auto</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY FMCG',this)">FMCG</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY METAL',this)">Metal</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY REALTY',this)">Realty</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY ENERGY',this)">Energy</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY PSU BANK',this)">PSU Bank</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY FINANCIAL SERVICES',this)">Financial</button>
+          <button class="tab-btn" onclick="switchSectorGL('NIFTY HEALTHCARE',this)">Healthcare</button>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="border-r">
+            <div
+              style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--green)">
+              ▲ Gainers</div>
+            <div id="sector-gainers-list" style="max-height:320px;overflow-y:auto"></div>
+          </div>
+          <div>
+            <div
+              style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--red)">
+              ▼ Losers</div>
+            <div id="sector-losers-list" style="max-height:320px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Most Active -->
+      <div class="card">
         <div class="card-header"><span>Most Active by Volume</span></div>
-        <div id="most-active-grid" class="grid gap-px bg-gray-100"
-          style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
+        <div id="most-active-grid" class="p-3 grid"
+          style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px"></div>
       </div>
     </div>
 
-    <!-- ===== INDICES TAB ===== -->
-    <div id="tab-indices" class="hidden">
-      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))"
-        id="all-indices-grid"></div>
+    <!-- ===== PRE-OPEN ===== -->
+    <div id="tab-preopen" class="hidden">
+      <div class="flex gap-2 mb-3 items-center flex-wrap">
+        <span style="font-size:11px;font-weight:600;color:var(--text2)">Key:</span>
+        <div class="sub-tabs" id="po-key-tabs" style="border:none;padding:0">
+          <button class="tab-btn active" onclick="switchPreopenKey('NIFTY',this)">NIFTY</button>
+          <button class="tab-btn" onclick="switchPreopenKey('BANKNIFTY',this)">BankNifty</button>
+          <button class="tab-btn" onclick="switchPreopenKey('FO',this)">F&O</button>
+          <button class="tab-btn" onclick="switchPreopenKey('SME',this)">SME</button>
+          <button class="tab-btn" onclick="switchPreopenKey('OTHERS',this)">Others</button>
+          <button class="tab-btn" onclick="switchPreopenKey('ALL',this)">All</button>
+        </div>
+        <div class="flex items-center gap-1">
+          <span style="font-size:11px;color:var(--text3)">Filter %:</span>
+          <input type="number" id="po-filter" class="inp" value="1.5" style="width:70px" onchange="renderPreopen()">
+        </div>
+      </div>
+      <!-- Stats row -->
+      <div id="po-stats" class="grid mb-3" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">
+      </div>
+      <!-- Movers -->
+      <div class="grid mb-3" style="grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card">
+          <div class="card-header"><span>▲ Gap-Up Movers</span></div>
+          <div id="po-gainers" style="max-height:400px;overflow-y:auto"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>▼ Gap-Down Movers</span></div>
+          <div id="po-losers" style="max-height:400px;overflow-y:auto"></div>
+        </div>
+      </div>
+      <!-- Full table -->
       <div class="card">
-        <div class="card-header"><span>All NSE Indices</span></div>
+        <div class="card-header"><span>All Pre-Open Stocks</span><span id="po-count" class="muted"
+            style="font-size:10px"></span></div>
         <div class="overflow-x-auto">
-          <table class="data-table" id="indices-table">
+          <table class="data-table">
             <thead>
               <tr>
-                <th class="text-left">Index</th>
-                <th>Last</th>
-                <th>Change</th>
-                <th>% Chg</th>
-                <th>Open</th>
-                <th>High</th>
-                <th>Low</th>
+                <th class="text-left">Symbol</th>
+                <th>IEP</th>
                 <th>Prev Close</th>
+                <th>Chg%</th>
+                <th>Buy Qty</th>
+                <th>Sell Qty</th>
+                <th>Final Qty</th>
+                <th>Purpose</th>
               </tr>
             </thead>
-            <tbody id="indices-tbody"></tbody>
+            <tbody id="po-tbody"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ===== EQUITIES TAB ===== -->
+    <!-- ===== INDICES ===== -->
+    <div id="tab-indices" class="hidden">
+      <div class="sub-tabs mb-3" style="border:1px solid var(--border);border-radius:8px;background:var(--bg2)"
+        id="idx-cat-tabs">
+        <button class="tab-btn active" onclick="switchIdxCat('broad',this)">Broad</button>
+        <button class="tab-btn" onclick="switchIdxCat('sectoral',this)">Sectoral</button>
+        <button class="tab-btn" onclick="switchIdxCat('thematic',this)">Thematic</button>
+        <button class="tab-btn" onclick="switchIdxCat('strategy',this)">Strategy</button>
+        <button class="tab-btn" onclick="switchIdxCat('esg',this)">ESG</button>
+        <button class="tab-btn" onclick="switchIdxCat('fixedincome',this)">Fixed Income</button>
+        <button class="tab-btn" onclick="switchIdxCat('all',this)">All</button>
+      </div>
+      <div id="idx-heatmap" class="grid mb-3" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px">
+      </div>
+      <div class="card">
+        <div class="card-header"><span id="idx-cat-label">Broad Market Indices</span><span id="idx-cat-count"
+            class="muted" style="font-size:10px"></span></div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Index</th>
+                <th>Last</th>
+                <th>Change</th>
+                <th>%Chg</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Prev Close</th>
+                <th>52W High</th>
+                <th>52W Low</th>
+                <th>Adv</th>
+                <th>Dec</th>
+              </tr>
+            </thead>
+            <tbody id="idx-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EQUITIES ===== -->
     <div id="tab-equities" class="hidden">
-      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
-        <input class="search-input" id="eq-search" placeholder="Search symbol or company..." style="max-width:280px"
-          oninput="filterEquities()">
-        <button class="tab-btn active" onclick="setEqFilter('gainers',this)" id="eq-tab-gainers">Gainers</button>
-        <button class="tab-btn" onclick="setEqFilter('losers',this)" id="eq-tab-losers">Losers</button>
-        <button class="tab-btn" onclick="setEqFilter('active',this)" id="eq-tab-active">Most Active</button>
-        <button onclick="fetchQuote()" class="btn-blue">Fetch Quote ↵</button>
+      <div class="flex gap-2 mb-3 flex-wrap items-center">
+        <input class="inp" id="eq-search" placeholder="Search symbol..." style="width:220px" oninput="filterEquities()">
+        <button class="tab-btn active" onclick="setEqFilter('gainers',this)">Gainers</button>
+        <button class="tab-btn" onclick="setEqFilter('losers',this)">Losers</button>
+        <button class="tab-btn" onclick="setEqFilter('active',this)">Most Active</button>
+        <div style="flex:1"></div>
+        <input class="inp" id="quote-input" placeholder="Symbol for quote..." style="width:200px"
+          onkeydown="if(event.key==='Enter')fetchQuote()">
+        <button onclick="fetchQuote()" class="btn btn-blue">Fetch Quote</button>
       </div>
-      <div class="flex gap-2 mb-2.5">
-        <input class="search-input" id="quote-input" placeholder="Enter symbol (e.g. RELIANCE)..."
-          style="max-width:220px" onkeydown="if(event.key==='Enter')fetchQuote()">
-      </div>
-      <div id="quote-result" class="mb-2.5"></div>
+      <div id="quote-result" class="mb-3"></div>
       <div class="card">
         <div class="overflow-x-auto">
-          <table class="data-table" id="eq-table">
+          <table class="data-table">
             <thead>
               <tr>
                 <th class="text-left">Symbol</th>
@@ -151,20 +1184,20 @@
       </div>
     </div>
 
-    <!-- ===== SECTORS TAB ===== -->
+    <!-- ===== SECTORS ===== -->
     <div id="tab-sectors" class="hidden">
-      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))" id="sectors-grid">
-      </div>
+      <div id="sectors-heatmap" class="grid mb-3"
+        style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px"></div>
       <div class="card">
-        <div class="card-header"><span>Sector Performance</span></div>
+        <div class="card-header"><span>All Sector Indices</span></div>
         <div class="overflow-x-auto">
           <table class="data-table">
             <thead>
               <tr>
-                <th class="text-left">Sector Index</th>
+                <th class="text-left">Index</th>
                 <th>Last</th>
                 <th>Change</th>
-                <th>% Chg</th>
+                <th>%Chg</th>
                 <th>52W High</th>
                 <th>52W Low</th>
               </tr>
@@ -175,112 +1208,191 @@
       </div>
     </div>
 
-    <!-- ===== ETF TAB ===== -->
-    <div id="tab-etf" class="hidden">
-      <div class="flex gap-2 mb-2.5">
-        <input class="search-input" id="etf-search" placeholder="Search ETF..." style="max-width:260px"
-          oninput="filterETF()">
+    <!-- ===== OPTIONS / F&O ===== -->
+    <div id="tab-options" class="hidden">
+      <div class="flex gap-2 mb-3 flex-wrap items-center">
+        <input class="inp" id="fno-sym" placeholder="Symbol (NIFTY, BANKNIFTY, RELIANCE...)" style="width:280px">
+        <button onclick="loadFnO()" class="btn btn-blue">Load Chain</button>
+        <span style="font-size:11px;color:var(--text3)">Expiry:</span>
+        <select id="fno-expiry" class="inp" onchange="renderOC()">
+          <option>—</option>
+        </select>
+      </div>
+      <div id="fno-stats" class="grid mb-3" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px">
+      </div>
+      <div class="card overflow-x-auto">
+        <table class="data-table" id="oc-table">
+          <thead>
+            <tr>
+              <th colspan="5" style="text-align:center;color:var(--green);border-right:2px solid var(--border2)">CALLS
+              </th>
+              <th style="text-align:center;background:var(--bg3)">Strike</th>
+              <th colspan="5" style="text-align:center;color:var(--red)">PUTS</th>
+            </tr>
+            <tr>
+              <th>OI</th>
+              <th>ChgOI</th>
+              <th>Vol</th>
+              <th>IV%</th>
+              <th>LTP</th>
+              <th style="background:var(--bg3);text-align:center">Strike</th>
+              <th>LTP</th>
+              <th>IV%</th>
+              <th>Vol</th>
+              <th>ChgOI</th>
+              <th>OI</th>
+            </tr>
+          </thead>
+          <tbody id="oc-tbody">
+            <tr>
+              <td colspan="11" style="text-align:center;padding:24px;color:var(--text3)">Enter a symbol and click Load
+                Chain</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== FII / DII ===== -->
+    <div id="tab-fii" class="hidden">
+      <div class="grid mb-3" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px" id="fii-stats">
       </div>
       <div class="card">
-        <div class="card-header">
-          <span>Exchange Traded Funds (NSE)</span>
-          <span id="etf-count" class="text-[10px] text-gray-400"></span>
+        <div class="card-header"><span>FII / DII Trade Activity</span></div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Category</th>
+                <th>Date</th>
+                <th>Buy Value (Cr)</th>
+                <th>Sell Value (Cr)</th>
+                <th>Net Value (Cr)</th>
+              </tr>
+            </thead>
+            <tbody id="fii-tbody"></tbody>
+          </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== EVENTS ===== -->
+    <div id="tab-events" class="hidden">
+      <div class="flex gap-2 mb-3 flex-wrap items-center">
+        <input class="inp" id="ev-search" placeholder="Search symbol or purpose..." style="width:260px"
+          oninput="filterEvents()">
+      </div>
+      <div class="card">
+        <div class="card-header"><span>NSE Corporate Event Calendar</span><span id="ev-count" class="muted"
+            style="font-size:10px"></span></div>
+        <div id="ev-list" style="max-height:600px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- ===== DEALS ===== -->
+    <div id="tab-deals" class="hidden">
+      <div class="flex gap-2 mb-3 items-center flex-wrap">
+        <span style="font-size:11px;font-weight:600;color:var(--text2)">Type:</span>
+        <div class="sub-tabs" id="deal-tabs" style="border:none;padding:0">
+          <button class="tab-btn active" onclick="switchDeal('bulk_deals',this)">Bulk Deals</button>
+          <button class="tab-btn" onclick="switchDeal('block_deals',this)">Block Deals</button>
+          <button class="tab-btn" onclick="switchDeal('short_sell',this)">Short Sell</button>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header"><span>Block Deals (Real-time)</span></div>
         <div class="overflow-x-auto">
           <table class="data-table">
             <thead>
               <tr>
                 <th class="text-left">Symbol</th>
-                <th>Name</th>
-                <th>LTP</th>
-                <th>Chg%</th>
-                <th>Volume</th>
-                <th>AUM (Cr)</th>
+                <th>Client</th>
+                <th>Buy/Sell</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Date</th>
               </tr>
             </thead>
-            <tbody id="etf-tbody"></tbody>
+            <tbody id="block-tbody">
+              <tr>
+                <td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
-    </div>
-
-    <!-- ===== MUTUAL FUNDS TAB ===== -->
-    <div id="tab-mf" class="hidden">
-      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
-        <input class="search-input" id="mf-search" placeholder="Search fund..." style="max-width:280px"
-          oninput="filterMF()">
-        <button class="tab-btn active" onclick="setMFCat('equity',this)">Equity</button>
-        <button class="tab-btn" onclick="setMFCat('debt',this)">Debt</button>
-        <button class="tab-btn" onclick="setMFCat('hybrid',this)">Hybrid</button>
-        <button class="tab-btn" onclick="setMFCat('index',this)">Index</button>
-      </div>
       <div class="card">
-        <div class="card-header"><span>Listed Mutual Funds (NSE MFSS)</span></div>
+        <div class="card-header"><span id="large-deal-title">Large Deals Snapshot</span></div>
         <div class="overflow-x-auto">
           <table class="data-table">
             <thead>
               <tr>
-                <th class="text-left">Fund Name</th>
-                <th>NAV</th>
-                <th>1D Ret%</th>
-                <th>1Y Ret%</th>
-                <th>Category</th>
-                <th>AUM (Cr)</th>
+                <th class="text-left">Symbol</th>
+                <th>Client</th>
+                <th>Buy/Sell</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Value</th>
               </tr>
             </thead>
-            <tbody id="mf-tbody"></tbody>
+            <tbody id="large-deal-tbody">
+              <tr>
+                <td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Select deal type above</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ===== OPTIONS / F&O TAB ===== -->
-    <div id="tab-options" class="hidden">
-      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
-        <input class="search-input" id="fno-sym" placeholder="Underlying (e.g. NIFTY, BANKNIFTY, RELIANCE)..."
-          style="max-width:280px">
-        <button onclick="loadFnO()" class="btn-blue">Load Chain</button>
-        <span class="text-[10px] text-gray-400">Expiry:</span>
-        <select id="fno-expiry" class="styled-select" onchange="renderOC()">
-          <option>Loading...</option>
+    <!-- ===== HISTORY ===== -->
+    <div id="tab-history" class="hidden">
+      <div class="flex gap-2 mb-3 items-center flex-wrap">
+        <input class="inp" id="hist-sym" placeholder="Symbol (e.g. RELIANCE)" style="width:200px">
+        <select id="hist-series" class="inp" style="width:80px">
+          <option>EQ</option>
+          <option>BE</option>
+          <option>SM</option>
+          <option>ST</option>
         </select>
+        <input type="date" id="hist-from" class="inp">
+        <span style="color:var(--text3);font-size:11px">to</span>
+        <input type="date" id="hist-to" class="inp">
+        <button onclick="loadHistory()" class="btn btn-blue">Load History</button>
       </div>
-      <!-- PCR + OI Stats -->
-      <div class="grid gap-2 mb-2.5" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))" id="fno-stats">
-      </div>
-      <!-- Option Chain Table -->
-      <div class="card overflow-x-auto">
-        <table class="data-table" id="oc-table">
-          <thead>
-            <tr class="text-[10px]">
-              <th colspan="5" class="text-center text-green border-r-2 border-gray-200">CALLS</th>
-              <th class="text-center bg-gray-50">Strike</th>
-              <th colspan="5" class="text-center text-red">PUTS</th>
-            </tr>
-            <tr>
-              <th>OI</th>
-              <th>Chg OI</th>
-              <th>Vol</th>
-              <th>IV%</th>
-              <th>LTP</th>
-              <th class="bg-gray-50 text-gray-700">Strike</th>
-              <th>LTP</th>
-              <th>IV%</th>
-              <th>Vol</th>
-              <th>Chg OI</th>
-              <th>OI</th>
-            </tr>
-          </thead>
-          <tbody id="oc-tbody"></tbody>
-        </table>
+      <div id="hist-result-meta" class="mb-2"></div>
+      <div class="card">
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="text-left">Date</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+                <th>Prev Close</th>
+                <th>Volume</th>
+                <th>Trades</th>
+                <th>Turnover</th>
+              </tr>
+            </thead>
+            <tbody id="hist-tbody">
+              <tr>
+                <td colspan="9" style="text-align:center;padding:24px;color:var(--text3)">Enter symbol and date range,
+                  then click Load History</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- ===== GLOBAL MARKETS TAB ===== -->
-    <div id="tab-intl" class="hidden">
-      <div class="grid gap-2 mb-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))" id="global-grid">
+    <!-- ===== GLOBAL ===== -->
+    <div id="tab-global" class="hidden">
+      <div id="global-grid" class="grid mb-3" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px">
       </div>
-      <div class="grid grid-cols-2 gap-2.5">
+      <div class="grid mb-3" style="grid-template-columns:1fr 1fr;gap:12px">
         <div class="card">
           <div class="card-header"><span>Commodities</span></div>
           <div id="commodities-list"></div>
@@ -290,55 +1402,46 @@
           <div id="forex-list"></div>
         </div>
       </div>
-      <div class="card mt-2.5">
+      <div class="card">
         <div class="card-header"><span>Crypto (Top 10)</span></div>
-        <div id="crypto-grid" class="grid gap-px bg-gray-100"
-          style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))"></div>
+        <div id="crypto-grid" class="p-3 grid"
+          style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px"></div>
       </div>
     </div>
 
-    <!-- ===== PORTFOLIO TAB ===== -->
+    <!-- ===== PORTFOLIO ===== -->
     <div id="tab-portfolio" class="hidden">
-      <div class="flex gap-2 mb-2.5 flex-wrap items-center">
-        <span class="text-[11px] font-semibold text-gray-700">Add Holding</span>
-        <input class="search-input" id="p-sym" placeholder="Symbol" style="width:120px">
-        <input class="search-input" id="p-qty" placeholder="Qty" type="number" style="width:80px">
-        <input class="search-input" id="p-avg" placeholder="Avg Price ₹" type="number" style="width:120px">
-        <input class="search-input" id="p-exc" placeholder="Exchange (OTHER)" style="width:120px">
-        <button onclick="addHolding()" class="btn-green">+ Add</button>
-        <button onclick="clearPortfolio()" class="btn-red">Clear All</button>
+      <div class="flex gap-2 mb-3 items-center flex-wrap">
+        <input class="inp" id="p-sym" placeholder="Symbol" style="width:110px">
+        <input class="inp" id="p-qty" placeholder="Qty" type="number" style="width:80px">
+        <input class="inp" id="p-avg" placeholder="Avg Price ₹" type="number" style="width:120px">
+        <input class="inp" id="p-exc" placeholder="Exchange" style="width:100px">
+        <button onclick="addHolding()" class="btn btn-green">+ Add</button>
+        <button onclick="clearPortfolio()" class="btn btn-red">Clear</button>
       </div>
-      <!-- Summary -->
-      <div class="grid gap-2 mb-2.5" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))"
-        id="portfolio-summary"></div>
-      <!-- Table -->
+      <div id="portfolio-summary" class="grid mb-3"
+        style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
       <div class="card">
         <div
-          class="grid gap-2 px-3.5 py-1.5 border-b border-gray-100 text-[10px] font-bold uppercase tracking-widest text-gray-400"
-          style="grid-template-columns:1fr 80px 80px 80px 90px 80px">
-          <span>Symbol</span>
-          <span class="text-right">Qty</span>
-          <span class="text-right">Avg</span>
-          <span class="text-right">LTP</span>
-          <span class="text-right">P&amp;L</span>
-          <span class="text-right">Action</span>
+          style="display:grid;grid-template-columns:1fr 70px 80px 80px 100px 60px;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)">
+          <span>Symbol</span><span style="text-align:right">Qty</span><span style="text-align:right">Avg</span><span
+            style="text-align:right">LTP</span><span style="text-align:right">P&L</span><span
+            style="text-align:right">Remove</span>
         </div>
         <div id="portfolio-rows"></div>
       </div>
     </div>
 
-    <!-- ===== WATCHLIST TAB ===== -->
+    <!-- ===== WATCHLIST ===== -->
     <div id="tab-watchlist" class="hidden">
-      <div class="flex gap-2 mb-2.5 items-center">
-        <input class="search-input" id="wl-input" placeholder="Add symbol to watchlist..." style="max-width:220px"
+      <div class="flex gap-2 mb-3 items-center">
+        <input class="inp" id="wl-input" placeholder="Add symbol..." style="width:220px"
           onkeydown="if(event.key==='Enter')addToWatchlist()">
-        <button onclick="addToWatchlist()" class="btn-blue">+ Watch</button>
+        <button onclick="addToWatchlist()" class="btn btn-blue">+ Watch</button>
       </div>
       <div class="card">
-        <div class="card-header">
-          <span>My Watchlist</span>
-          <span id="wl-count" class="text-[10px] text-gray-400"></span>
-        </div>
+        <div class="card-header"><span>My Watchlist</span><span id="wl-count" class="muted"
+            style="font-size:10px"></span></div>
         <div class="overflow-x-auto">
           <table class="data-table">
             <thead>
@@ -360,22 +1463,21 @@
       </div>
     </div>
 
-  </main><!-- end main -->
+  </main>
 
   <script>
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // CONFIG
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     const RENDER_URL = "https://nse-script-z8na.onrender.com";
-    const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    const API_BASE = (location.hostname === "localhost" || location.hostname === "127.0.0.1"
       ? "http://localhost:5000" : RENDER_URL).replace(/\/+$/, "");
 
     const $ = id => document.getElementById(id);
     const fmt = (n, d = 2) => n != null ? Number(n).toLocaleString("en-IN", { maximumFractionDigits: d }) : "—";
     const pct = n => n != null ? (n >= 0 ? "+" : "") + Number(n).toFixed(2) + "%" : "—";
-    const col = n => n >= 0 ? "var(--green)" : "var(--red)";
-    const colCls = n => n >= 0 ? "text-green" : "text-red";
-    const chip = n => `<span class="${n >= 0 ? 'chip-green' : 'chip-red'}">${pct(n)}</span>`;
+    const colCls = n => Number(n) >= 0 ? "g" : "r";
+    const chip = n => `<span class="chip ${Number(n) >= 0 ? 'chip-g' : 'chip-r'}">${pct(n)}</span>`;
 
     async function api(path) {
       const r = await fetch(API_BASE + path);
@@ -383,54 +1485,58 @@
       return r.json();
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // STATE
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    let indicesData = [];
     let equitiesData = { gainers: [], losers: [], active: [] };
     let currentEqFilter = "gainers";
-    let eqSearchTerm = "";
-    let etfData = [];
-    let mfData = [];
-    let mfCategory = "equity";
-    let indicesData = [];
+    let currentHeatmapCat = "broad";
+    let currentIdxCat = "broad";
+    let currentTab = "overview";
+    let currentPreopenKey = "NIFTY";
+    let currentDealType = "bulk_deals";
     let ocData = null;
+    let eventsRaw = [];
+    let glCache = {};
+    let preOpenRaw = {};
     let portfolio = JSON.parse(localStorage.getItem("nse_portfolio") || "[]");
     let watchlist = JSON.parse(localStorage.getItem("nse_watchlist") || "[]");
     let portfolioLive = {};
     let watchlistLive = {};
-    let currentTab = "overview";
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // CLOCK
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     setInterval(() => {
       $("clock").textContent = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
     }, 1000);
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // TAB SWITCH
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    const ALL_TABS = ["overview", "preopen", "indices", "equities", "sectors", "options", "fii", "events", "deals", "history", "global", "portfolio", "watchlist"];
     function switchTab(id, btn) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      $("main-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      ["overview", "indices", "equities", "sectors", "etf", "mf", "options", "intl", "portfolio", "watchlist"].forEach(t => {
-        const el = $("tab-" + t);
-        if (el) el.classList.toggle("hidden", t !== id);
-      });
+      ALL_TABS.forEach(t => { const el = $("tab-" + t); if (el) el.classList.toggle("hidden", t !== id) });
       currentTab = id;
       if (id === "portfolio") renderPortfolio();
-      if (id === "watchlist") renderWatchlist();
-      if (id === "etf") renderETFTable();
-      if (id === "mf") renderMFTable();
+      if (id === "watchlist") { renderWatchlist(); fetchWatchlistLive(); }
       if (id === "sectors") renderSectors();
       if (id === "indices") renderAllIndices();
-      if (id === "intl") loadGlobal();
+      if (id === "global") loadGlobal();
+      if (id === "fii") loadFIIDII();
+      if (id === "events") loadEvents();
+      if (id === "deals") loadDeals();
+      if (id === "preopen") loadPreopen();
       if (id === "options") { $("fno-sym").value = "NIFTY"; loadFnO(); }
+      if (id === "history") initHistoryDates();
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // MARKET STATUS
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     async function loadMarketStatus() {
       try {
         const d = await api("/api/market-status");
@@ -440,384 +1546,300 @@
           const open = cm.marketStatus === "Open";
           $("mkt-dot").style.background = open ? "var(--green)" : "var(--red)";
           $("mkt-txt").textContent = open ? "OPEN" : "CLOSED";
-          $("mkt-txt").className = `mono text-[10px] font-semibold ${open ? 'text-green' : 'text-red'}`;
+          $("mkt-txt").style.color = open ? "var(--green)" : "var(--red)";
         }
       } catch (e) { }
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // INDICES
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     async function loadIndices() {
       try {
         const d = await api("/api/indices");
         indicesData = d.data || [];
-        renderIndexPills(indicesData);
-        renderTicker(indicesData);
-        renderOverviewIndices(indicesData);
+        renderIndexPills();
+        renderTicker();
+        renderOverviewIndices();
       } catch (e) { }
     }
 
-    function renderIndexPills(data) {
-      const el = $("idx-pills");
-      el.innerHTML = data.slice(0, 8).map(i => {
-        return `<div class="flex items-center gap-2 flex-shrink-0 cursor-default">
-        <span class="text-[10px] font-semibold text-gray-500">${i.name}</span>
-        <span class="mono text-[11px] font-semibold ${colCls(i.pChange)}">${fmt(i.last)}</span>
-        <span class="text-[10px] ${colCls(i.pChange)}">${pct(i.pChange)}</span>
-      </div>`;
-      }).join('<span class="pill-sep">|</span>');
+    function renderIndexPills() {
+      $("idx-pills").innerHTML = indicesData.slice(0, 8).map(i => `
+    <div class="idx-pill">
+      <span class="idx-pill-name">${i.name.replace("NIFTY ", "")}</span>
+      <span class="idx-pill-val ${colCls(i.pChange)}">${fmt(i.last)}</span>
+      <span class="idx-pill-chg ${colCls(i.pChange)}">${pct(i.pChange)}</span>
+    </div>`).join('<span class="pill-sep">|</span>');
     }
 
-    function renderTicker(data) {
-      const all = [...data, ...data];
-      $("ticker").innerHTML = all.map(i => {
-        return `<span class="flex items-center gap-2 px-5 text-gray-500 border-r border-gray-200">
-        <span class="font-semibold text-gray-700">${i.name}</span>
-        <span class="mono ${colCls(i.pChange)}">${fmt(i.last)}</span>
-        <span class="${colCls(i.pChange)} text-[10px]">${pct(i.pChange)}</span>
-      </span>`;
-      }).join("");
+    function renderTicker() {
+      const all = [...indicesData, ...indicesData];
+      $("ticker-track").innerHTML = all.map(i => `
+    <span class="tick-item">
+      <span class="tick-name">${i.name}</span>
+      <span class="mono ${colCls(i.pChange)}" style="font-size:10px">${fmt(i.last)}</span>
+      <span class="${colCls(i.pChange)}" style="font-size:10px;font-family:var(--font-mono)">${pct(i.pChange)}</span>
+    </span>`).join("");
     }
 
-    function renderOverviewIndices(data) {
-      $("overview-indices").innerHTML = data.map(i => `
-      <div class="idx-card">
-        <div class="section-label">${i.name}</div>
-        <div class="mono text-[13px] font-semibold text-gray-900 mb-0.5">₹${fmt(i.last)}</div>
-        <div class="flex gap-1.5 items-center">
-          ${chip(i.pChange)}
-          <span class="text-[9px] text-gray-400">${i.pChange >= 0 ? "▲" : "▼"} ${fmt(Math.abs(i.change))}</span>
-        </div>
-      </div>`).join("");
+    // ── Index categories ──────────────────────────────
+    const IDX_CAT = {
+      broad: ["NIFTY 50", "NIFTY NEXT 50", "NIFTY 100", "NIFTY 200", "NIFTY 500", "NIFTY MIDCAP 50", "NIFTY MIDCAP 100", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 50", "NIFTY SMALLCAP 100", "NIFTY SMALLCAP 250", "NIFTY MIDSMALLCAP 400", "NIFTY MICROCAP 250", "INDIA VIX"],
+      sectoral: ["NIFTY BANK", "NIFTY IT", "NIFTY PHARMA", "NIFTY AUTO", "NIFTY FMCG", "NIFTY METAL", "NIFTY REALTY", "NIFTY ENERGY", "NIFTY INFRA", "NIFTY MEDIA", "NIFTY PSU BANK", "NIFTY FINANCIAL SERVICES", "NIFTY PRIVATE BANK", "NIFTY HEALTHCARE", "NIFTY CONSUMER DURABLES", "NIFTY OIL & GAS", "NIFTY COMMODITIES", "NIFTY CPSE", "NIFTY PSE", "NIFTY SERVICES SECTOR", "NIFTY MNC", "NIFTY SME EMERGE"],
+      thematic: ["NIFTY INDIA DIGITAL", "NIFTY INDIA MANUFACTURING", "NIFTY INDIA CONSUMPTION", "NIFTY HOUSING", "NIFTY CORE HOUSING", "NIFTY CAPITAL MARKETS", "NIFTY TRANSPORTATION & LOGISTICS", "NIFTY INDIA DEFENCE", "NIFTY INDIA TOURISM", "NIFTY INDIA PSU", "NIFTY RURAL", "NIFTY DIVIDEND OPPORTUNITIES 50", "NIFTY GROWTH SECTORS 15"],
+      strategy: ["NIFTY100 QUALITY 30", "NIFTY100 LOW VOLATILITY 30", "NIFTY100 MOMENTUM 30", "NIFTY ALPHA 50", "NIFTY50 VALUE 20", "NIFTY200 QUALITY 30", "NIFTY200 MOMENTUM 30", "NIFTY200 ALPHA 30", "NIFTY200 LOW VOLATILITY 30", "NIFTY ALPHA LOW VOLATILITY 30", "NIFTY QUALITY LOW VOLATILITY 30", "NIFTY MOMENTUM QUALITY 50", "NIFTY500 VALUE 50", "NIFTY500 MULTICAP 50:25:25"],
+      esg: ["NIFTY100 ESG", "NIFTY100 ENHANCED ESG"],
+      fixedincome: ["NIFTY 10 YR BENCHMARK G-SEC", "NIFTY SDL APR 2026 TOP 12", "NIFTY AAA CORPORATE BOND"],
+      group: ["NIFTY GLOBAL BUSINESS", "NIFTY TATA GROUP", "NIFTY ADITYA BIRLA GROUP", "NIFTY MAHINDRA GROUP"]
+    };
+
+    function getCatData(cat) {
+      if (cat === "all") return indicesData;
+      const names = IDX_CAT[cat] || [];
+      return names.map(n => indicesData.find(i => i.name === n)).filter(Boolean);
+    }
+
+    function heatColor(p) {
+      const v = parseFloat(p) || 0;
+      const abs = Math.min(Math.abs(v), 4);
+      const a = (abs / 4) * 0.2 + 0.05;
+      const ba = (abs / 4) * 0.4 + 0.1;
+      if (v > 0) return `background:rgba(0,217,126,${a});border-color:rgba(0,217,126,${ba})`;
+      if (v < 0) return `background:rgba(255,69,96,${a});border-color:rgba(255,69,96,${ba})`;
+      return "";
+    }
+
+    function heatCard(i) {
+      const hs = heatColor(i.pChange);
+      return `<div class="idx-card" style="${hs}">
+    <div class="idx-card-name">${i.name.replace(/^NIFTY /, "")}</div>
+    <div class="idx-card-val">${fmt(i.last)}</div>
+    <div class="idx-card-bottom">${chip(i.pChange)}<span class="muted" style="font-size:9px">${fmt(Math.abs(i.change))}</span></div>
+  </div>`;
+    }
+
+    function switchHeatmap(cat, btn) {
+      currentHeatmapCat = cat;
+      $("hm-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderOverviewIndices();
+    }
+
+    function switchIdxCat(cat, btn) {
+      currentIdxCat = cat;
+      $("idx-cat-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderAllIndices();
+    }
+
+    function renderOverviewIndices() {
+      const data = getCatData(currentHeatmapCat);
+      if ($("hm-count")) $("hm-count").textContent = data.length + " indices";
+      $("heatmap-grid").innerHTML = data.map(heatCard).join("");
     }
 
     function renderAllIndices() {
       if (!indicesData.length) return;
-      const grid = $("all-indices-grid");
-      grid.innerHTML = indicesData.map(i => `
-      <div class="idx-card">
-        <div class="section-label">${i.name}</div>
-        <div class="mono text-[13px] font-semibold ${colCls(i.pChange)}">${fmt(i.last)}</div>
-        <div class="text-[10px] ${colCls(i.pChange)}">${pct(i.pChange)}</div>
-      </div>`).join("");
-      $("indices-tbody").innerHTML = indicesData.map(i => `
-      <tr>
-        <td>${i.name}</td>
-        <td class="mono">${fmt(i.last)}</td>
-        <td class="mono ${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
-        <td>${chip(i.pChange)}</td>
-        <td class="mono">${fmt(i.open || i.previousClose)}</td>
-        <td class="mono text-green">${fmt(i.yearHigh || i.high)}</td>
-        <td class="mono text-red">${fmt(i.yearLow || i.low)}</td>
-        <td class="mono">${fmt(i.previousClose)}</td>
-      </tr>`).join("");
+      const data = getCatData(currentIdxCat);
+      const label = (currentIdxCat === "all" ? "All" : currentIdxCat.charAt(0).toUpperCase() + currentIdxCat.slice(1)) + " Indices";
+      if ($("idx-cat-label")) $("idx-cat-label").textContent = label;
+      if ($("idx-cat-count")) $("idx-cat-count").textContent = data.length + " indices";
+      $("idx-heatmap").innerHTML = data.map(heatCard).join("");
+      $("idx-tbody").innerHTML = data.map(i => `
+    <tr>
+      <td>${i.name}</td>
+      <td>${fmt(i.last)}</td>
+      <td class="${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
+      <td>${chip(i.pChange)}</td>
+      <td>${fmt(i.open || i.previousClose)}</td>
+      <td class="g">${fmt(i.high)}</td>
+      <td class="r">${fmt(i.low)}</td>
+      <td>${fmt(i.previousClose)}</td>
+      <td class="g">${fmt(i.yearHigh)}</td>
+      <td class="r">${fmt(i.yearLow)}</td>
+      <td class="g">${i.advances || "—"}</td>
+      <td class="r">${i.declines || "—"}</td>
+    </tr>`).join("");
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // GAINERS / LOSERS
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    function glRow(s, up) {
+      return `<div class="gl-row">
+    <div>
+      <div class="gl-sym">${s.symbol}</div>
+      <div class="gl-vol">Vol: ${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</div>
+    </div>
+    <div>
+      <div class="gl-ltp">₹${fmt(s.ltp || s.lastPrice)}</div>
+      <div class="gl-chg ${up ? "g" : "r"}">${pct(s.netPrice || s.pChange)}</div>
+    </div>
+  </div>`;
+    }
+
+    function renderGLPair(data, gId, lId, countId) {
+      const g = data.gainers || [], l = data.losers || [];
+      if (countId && $(countId)) $(countId).textContent = g.length + " gainers · " + l.length + " losers";
+      $(gId).innerHTML = g.length ? g.map(s => glRow(s, true)).join("") : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">No data</div>`;
+      $(lId).innerHTML = l.length ? l.map(s => glRow(s, false)).join("") : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">No data</div>`;
+    }
+
+    function skeletonGL(gId, lId) {
+      const sk = Array(6).fill(0).map(() => `<div style="padding:8px 14px;border-bottom:1px solid var(--border)"><div class="skel" style="height:14px;margin-bottom:4px;border-radius:4px"></div><div class="skel" style="height:10px;width:60%;border-radius:4px"></div></div>`).join("");
+      $(gId).innerHTML = sk; $(lId).innerHTML = sk;
+    }
+
+    async function loadAndRenderGL(indexName, gId, lId, countId) {
+      if (glCache[indexName]) { renderGLPair(glCache[indexName], gId, lId, countId); return; }
+      skeletonGL(gId, lId);
+      try {
+        const d = await api("/api/index-stocks/" + encodeURIComponent(indexName));
+        glCache[indexName] = d;
+        if (indexName === "NIFTY 50") { equitiesData.gainers = d.gainers; equitiesData.losers = d.losers; renderEqTable(); }
+        renderGLPair(d, gId, lId, countId);
+      } catch (e) {
+        $(gId).innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">Error loading data</div>`;
+        $(lId).innerHTML = "";
+      }
+    }
+
     async function loadGainersLosers() {
       try {
         const d = await api("/api/gainers-losers");
         equitiesData.gainers = d.gainers || [];
         equitiesData.losers = d.losers || [];
-        renderGainerLoserOverview(d.gainers, "gainers-list", true);
-        renderGainerLoserOverview(d.losers, "losers-list", false);
-        $("gain-count").textContent = (d.gainers?.length || 0) + " stocks";
-        $("lose-count").textContent = (d.losers?.length || 0) + " stocks";
+        const wrapped = { gainers: equitiesData.gainers, losers: equitiesData.losers };
+        glCache["NIFTY 50"] = glCache["NIFTY 50"] || wrapped;
+        renderGLPair(wrapped, "gainers-list", "losers-list", "gl-count");
+        loadAndRenderGL("NIFTY BANK", "sector-gainers-list", "sector-losers-list", "sector-gl-count");
         renderEqTable();
       } catch (e) { }
     }
 
-    function renderGainerLoserOverview(arr, id, up) {
-      if (!arr?.length) { $(id).innerHTML = '<div class="px-3 py-2.5 text-[11px] text-gray-400">No data</div>'; return; }
-      $(id).innerHTML = arr.slice(0, 8).map(s => `
-      <div class="flex justify-between items-center px-3 py-1.5 border-b border-gray-50">
-        <div>
-          <div class="text-[11px] font-semibold text-gray-800">${s.symbol}</div>
-          <div class="mono text-[9px] text-gray-400">Vol: ${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</div>
-        </div>
-        <div class="text-right">
-          <div class="mono text-[11px] text-gray-700">₹${fmt(s.ltp)}</div>
-          <div class="text-[10px] font-semibold ${up ? 'text-green' : 'text-red'}">${pct(s.netPrice)}</div>
-        </div>
-      </div>`).join("");
+    function switchGLTab(name, btn) {
+      $("gl-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadAndRenderGL(name, "gainers-list", "losers-list", "gl-count");
     }
 
-    // ============================================================
+    function switchSectorGL(name, btn) {
+      $("sector-gl-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadAndRenderGL(name, "sector-gainers-list", "sector-losers-list", "sector-gl-count");
+    }
+
+    // ═══════════════════════════════════════════════════
     // MOST ACTIVE
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     async function loadMostActive() {
       try {
         const d = await api("/api/most-active");
         equitiesData.active = d.data || [];
-        const grid = $("most-active-grid");
-        if (!d.data?.length) return;
-        grid.innerHTML = d.data.slice(0, 12).map(s => `
-        <div class="grid-cell">
-          <div class="text-[10px] font-bold text-gray-500 mb-0.5">${s.symbol}</div>
-          <div class="mono text-[12px] font-semibold text-gray-800">₹${fmt(s.ltp)}</div>
-          <div class="text-[10px] font-semibold ${colCls(s.netPrice)}">${pct(s.netPrice)}</div>
-        </div>`).join("");
+        $("most-active-grid").innerHTML = (d.data || []).slice(0, 12).map(s => `
+      <div class="grid-cell">
+        <div class="grid-cell-sym">${s.symbol}</div>
+        <div class="grid-cell-val">₹${fmt(s.ltp)}</div>
+        <div class="${colCls(s.netPrice)}" style="font-family:var(--font-mono);font-size:10px;font-weight:600">${pct(s.netPrice)}</div>
+      </div>`).join("");
+        if (currentTab === "equities") renderEqTable();
       } catch (e) { }
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // EQUITIES TABLE
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     function setEqFilter(f, btn) {
       currentEqFilter = f;
-      document.querySelectorAll("[id^=eq-tab-]").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll("#tab-equities .tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       renderEqTable();
     }
 
-    function filterEquities() {
-      eqSearchTerm = $("eq-search").value.toLowerCase();
-      renderEqTable();
-    }
+    function filterEquities() { renderEqTable(); }
 
     function renderEqTable() {
-      let data = equitiesData[currentEqFilter === "active" ? "active" : currentEqFilter] === "gainers" ? equitiesData.gainers :
-        currentEqFilter === "losers" ? equitiesData.losers : equitiesData.active;
+      const search = ($("eq-search")?.value || "").toLowerCase();
+      let data = currentEqFilter === "gainers" ? equitiesData.gainers : currentEqFilter === "losers" ? equitiesData.losers : equitiesData.active;
       if (!data) data = [];
-      if (eqSearchTerm) data = data.filter(s => (s.symbol || "").toLowerCase().includes(eqSearchTerm));
+      if (search) data = data.filter(s => (s.symbol || "").toLowerCase().includes(search));
       $("eq-tbody").innerHTML = data.map(s => {
         const ch = s.netPrice || s.pChange || 0;
         return `<tr>
-        <td>${s.symbol}</td>
-        <td class="mono">₹${fmt(s.ltp || s.lastPrice)}</td>
-        <td>${chip(ch)}</td>
-        <td class="mono text-gray-500">${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</td>
-        <td class="mono">₹${fmt(s.previousClose || s.prevClose)}</td>
-        <td class="mono text-green">₹${fmt(s.yearHigh || s.weekHighLow?.max)}</td>
-        <td class="mono text-red">₹${fmt(s.yearLow || s.weekHighLow?.min)}</td>
-      </tr>`;
-      }).join("") || `<tr><td colspan="7" class="text-center py-5 text-gray-400">No data</td></tr>`;
+      <td style="color:var(--blue)">${s.symbol}</td>
+      <td>₹${fmt(s.ltp || s.lastPrice)}</td>
+      <td>${chip(ch)}</td>
+      <td class="muted">${s.tradedQuantity ? Number(s.tradedQuantity).toLocaleString("en-IN") : "—"}</td>
+      <td>₹${fmt(s.previousClose || s.prevClose)}</td>
+      <td class="g">₹${fmt(s.yearHigh)}</td>
+      <td class="r">₹${fmt(s.yearLow)}</td>
+    </tr>`;
+      }).join() || `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No data</td></tr>`;
     }
 
-    // ============================================================
-    // QUOTE FETCH
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    // QUOTE
+    // ═══════════════════════════════════════════════════
     async function fetchQuote() {
       const sym = ($("quote-input").value || "").trim().toUpperCase();
       if (!sym) return;
       const el = $("quote-result");
-      el.innerHTML = `<div class="skel h-8 w-full"></div>`;
+      el.innerHTML = `<div class="skel" style="height:60px;border-radius:8px"></div>`;
       try {
-        const d = await api(`/api/quote/${sym}`);
+        const d = await api("/api/quote/" + sym);
         el.innerHTML = `
-        <div class="card px-4 py-3 flex flex-wrap gap-4 items-center">
-          <div class="flex-1 min-w-40">
-            <div class="text-[13px] font-bold text-gray-900">${d.companyName || d.symbol}</div>
-            <div class="mono text-[10px] text-gray-400">${d.symbol} • NSE</div>
-          </div>
-          <div class="text-right">
-            <div class="mono text-lg font-bold ${colCls(d.pChange)}">₹${fmt(d.lastPrice)}</div>
-            <div class="text-[11px] font-semibold ${colCls(d.pChange)}">${pct(d.pChange)} (${d.change >= 0 ? "+" : ""}${fmt(d.change)})</div>
-          </div>
-          ${[["Open", d.open], ["Prev", d.previousClose], ["High", d.high, "text-green"], ["Low", d.low, "text-red"], ["52W H", d.weekHighLow?.max, "text-green"], ["52W L", d.weekHighLow?.min, "text-red"]].map(([k, v, c]) =>
-          `<div class="stat-chip">
-              <div class="text-[9px] text-gray-400 uppercase tracking-widest mb-0.5">${k}</div>
-              <div class="mono text-[11px] font-semibold ${c || 'text-gray-800'}">₹${fmt(v)}</div>
-            </div>`).join("")}
-        </div>`;
+    <div class="card p-3 flex flex-wrap gap-2 items-center mb-2">
+      <div style="flex:1;min-width:160px">
+        <div style="font-size:13px;font-weight:700">${d.companyName || d.symbol}</div>
+        <div class="mono muted" style="font-size:10px">${d.symbol} • NSE</div>
+      </div>
+      <div style="text-align:right">
+        <div class="mono font-bold ${colCls(d.pChange)}" style="font-size:18px">₹${fmt(d.lastPrice)}</div>
+        <div class="${colCls(d.pChange)}" style="font-size:11px;font-weight:600">${pct(d.pChange)} (${d.change >= 0 ? "+" : ""}${fmt(d.change)})</div>
+      </div>
+      ${[["Open", d.open], ["Prev", d.previousClose], ["High", d.high, "g"], ["Low", d.low, "r"], ["52W H", d.weekHighLow?.max, "g"], ["52W L", d.weekHighLow?.min, "r"]].map(([k, v, c]) => `
+        <div class="stat-chip"><div class="stat-label">${k}</div><div class="stat-val ${c || ""}">₹${fmt(v)}</div></div>`).join("")}
+    </div>`;
       } catch (e) {
-        el.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-lg px-3.5 py-2 text-[11px] text-red-600">Symbol not found or API offline</div>`;
+        el.innerHTML = `<div style="background:var(--red2);border:1px solid var(--red);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--red)">Symbol not found or API offline</div>`;
       }
     }
 
-    // ============================================================
-    // SECTORS (built from index data)
-    // ============================================================
-    const SECTOR_NAMES = [
-      // Broad Market
-      "NIFTY 50", "NIFTY NEXT 50", "NIFTY 100", "NIFTY 200", "NIFTY 500",
-      "NIFTY MIDCAP 50", "NIFTY MIDCAP 100", "NIFTY MIDCAP 150",
-      "NIFTY SMALLCAP 50", "NIFTY SMALLCAP 100", "NIFTY SMALLCAP 250",
-      "NIFTY MIDSMALLCAP 400", "NIFTY MICROCAP 250",
-      // Sectoral
-      "NIFTY BANK", "NIFTY IT", "NIFTY PHARMA", "NIFTY AUTO", "NIFTY FMCG",
-      "NIFTY METAL", "NIFTY REALTY", "NIFTY ENERGY", "NIFTY INFRA",
-      "NIFTY MEDIA", "NIFTY PSU BANK", "NIFTY FINANCIAL SERVICES",
-      "NIFTY PRIVATE BANK", "NIFTY HEALTHCARE", "NIFTY CONSUMER DURABLES",
-      "NIFTY OIL & GAS",
-      // Thematic / Strategy
-      "NIFTY DIVIDEND OPPORTUNITIES 50", "NIFTY GROWTH SECTORS 15",
-      "NIFTY100 QUALITY 30", "NIFTY100 LOW VOLATILITY 30",
-      "NIFTY100 MOMENTUM 30", "NIFTY ALPHA 50", "NIFTY50 VALUE 20",
-      "NIFTY200 QUALITY 30", "NIFTY200 MOMENTUM 30", "NIFTY200 ALPHA 30",
-      "NIFTY200 LOW VOLATILITY 30",
-      // ESG
-      "NIFTY100 ESG", "NIFTY100 ENHANCED ESG",
-      // Others
-      "NIFTY COMMODITIES", "NIFTY CPSE", "NIFTY PSE",
-      "NIFTY SERVICES SECTOR", "NIFTY INDIA DIGITAL",
-      "NIFTY INDIA MANUFACTURING", "NIFTY INDIA CONSUMPTION", "NIFTY MNC",
-      "NIFTY SME EMERGE",
-      // More Thematic
-      "NIFTY HOUSING", "NIFTY CORE HOUSING", "NIFTY CAPITAL MARKETS",
-      "NIFTY TRANSPORTATION & LOGISTICS", "NIFTY INDIA DEFENCE",
-      "NIFTY INDIA TOURISM", "NIFTY INDIA PSU", "NIFTY RURAL",
-      "NIFTY SHARIAH 25", "NIFTY50 SHARIAH", "NIFTY500 SHARIAH",
-      // Factor + Smart Beta
-      "NIFTY ALPHA LOW VOLATILITY 30", "NIFTY QUALITY LOW VOLATILITY 30",
-      "NIFTY MOMENTUM QUALITY 50", "NIFTY500 VALUE 50",
-      "NIFTY500 MULTICAP 50:25:25",
-      // Fixed Income
-      "NIFTY 10 YR BENCHMARK G-SEC", "NIFTY SDL APR 2026 TOP 12",
-      "NIFTY AAA CORPORATE BOND",
-      // International / Group
-      "NIFTY GLOBAL BUSINESS", "NIFTY TATA GROUP",
-      "NIFTY ADITYA BIRLA GROUP", "NIFTY MAHINDRA GROUP"
-    ];
+    // ═══════════════════════════════════════════════════
+    // SECTORS
+    // ═══════════════════════════════════════════════════
+    const SECTOR_IDX = ["NIFTY BANK", "NIFTY IT", "NIFTY PHARMA", "NIFTY AUTO", "NIFTY FMCG", "NIFTY METAL", "NIFTY REALTY", "NIFTY ENERGY", "NIFTY INFRA", "NIFTY MEDIA", "NIFTY PSU BANK", "NIFTY FINANCIAL SERVICES", "NIFTY PRIVATE BANK", "NIFTY HEALTHCARE", "NIFTY CONSUMER DURABLES", "NIFTY OIL & GAS", "NIFTY COMMODITIES", "NIFTY CPSE", "NIFTY PSE", "NIFTY SERVICES SECTOR", "NIFTY MNC", "NIFTY SME EMERGE"];
 
     function renderSectors() {
-      const sectorData = SECTOR_NAMES.map(name => indicesData.find(i => i.name === name)).filter(Boolean);
-      const extra = indicesData.filter(i => i.name.startsWith("NIFTY") && !SECTOR_NAMES.includes(i.name));
-      const all = [...sectorData, ...extra.slice(0, 10)];
-
-      $("sectors-grid").innerHTML = all.map(i => `
-      <div class="idx-card">
-        <div class="section-label">${i.name.replace("NIFTY ", "")}</div>
-        <div class="mono text-[13px] font-semibold text-gray-900">${fmt(i.last)}</div>
-        <div>${chip(i.pChange)}</div>
-      </div>`).join("");
-
-      $("sector-tbody").innerHTML = all.map(i => `
-      <tr>
-        <td>${i.name}</td>
-        <td class="mono">${fmt(i.last)}</td>
-        <td class="mono ${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
-        <td>${chip(i.pChange)}</td>
-        <td class="mono text-green">${fmt(i.yearHigh || i.high)}</td>
-        <td class="mono text-red">${fmt(i.yearLow || i.low)}</td>
-      </tr>`).join("");
+      const data = SECTOR_IDX.map(n => indicesData.find(i => i.name === n)).filter(Boolean);
+      $("sectors-heatmap").innerHTML = data.map(heatCard).join("");
+      $("sector-tbody").innerHTML = data.map(i => `
+    <tr>
+      <td>${i.name}</td>
+      <td>${fmt(i.last)}</td>
+      <td class="${colCls(i.pChange)}">${i.change >= 0 ? "+" : ""}${fmt(i.change)}</td>
+      <td>${chip(i.pChange)}</td>
+      <td class="g">${fmt(i.yearHigh || i.high)}</td>
+      <td class="r">${fmt(i.yearLow || i.low)}</td>
+    </tr>`).join("");
     }
 
-    // ============================================================
-    // ETF (static list + live quotes attempt)
-    // ============================================================
-    const ETF_LIST = [
-      { sym: "NIFTYBEES", name: "Nippon India Nifty BeES", aum: "12,340" },
-      { sym: "BANKBEES", name: "Nippon India Bank BeES", aum: "4,210" },
-      { sym: "JUNIORBEES", name: "Nippon India Junior BeES", aum: "2,100" },
-      { sym: "GOLDBEES", name: "Nippon India Gold BeES", aum: "8,900" },
-      { sym: "LIQUIDBEES", name: "Nippon India Liquid BeES", aum: "22,400" },
-      { sym: "ITBEES", name: "Nippon India IT BeES", aum: "980" },
-      { sym: "PHARMABEES", name: "Nippon India Pharma BeES", aum: "540" },
-      { sym: "SETFNIF50", name: "SBI-ETF Nifty 50", aum: "1,500" },
-      { sym: "SETFNN50", name: "SBI-ETF Nifty Next 50", aum: "890" },
-      { sym: "ICICIB22", name: "ICICI Pru Bharat 22 ETF", aum: "19,200" },
-      { sym: "CPSE", name: "CPSE ETF (Govt)", aum: "45,000" },
-      { sym: "UTINIFTETF", name: "UTI Nifty 50 ETF", aum: "2,300" },
-      { sym: "MOM100", name: "Mirae Nifty Midcap 150", aum: "760" },
-      { sym: "SILVERETF", name: "Mirae Silver ETF", aum: "420" },
-      { sym: "AUTOBEES", name: "Mirae Auto ETF", aum: "280" },
-      { sym: "HDFCNIFTY", name: "HDFC Nifty 50 ETF", aum: "3,400" },
-      { sym: "HDFCMID150", name: "HDFC Midcap 150 ETF", aum: "900" },
-      { sym: "NIFTYETF", name: "Kotak Nifty 50 ETF", aum: "1,800" },
-      { sym: "NIFTYBEESITR", name: "Nifty BeES (IDFC)", aum: "300" },
-      { sym: "MAFANG", name: "Mirae FANG+ ETF", aum: "1,200" },
-    ];
-    etfData = ETF_LIST.map(e => ({ ...e, ltp: null, chg: null, vol: null }));
-
-    async function loadETFQuotes() {
-      for (let i = 0; i < Math.min(5, ETF_LIST.length); i++) {
-        try {
-          const d = await api(`/api/quote/${ETF_LIST[i].sym}`);
-          etfData[i].ltp = d.lastPrice;
-          etfData[i].chg = d.pChange;
-          etfData[i].vol = d.totalTradedVolume;
-        } catch (e) { }
-      }
-      if (currentTab === "etf") renderETFTable();
-    }
-
-    function filterETF() {
-      renderETFTable($("etf-search").value.toLowerCase());
-    }
-
-    function renderETFTable(filter = "") {
-      let data = filter ? etfData.filter(e => e.sym.toLowerCase().includes(filter) || e.name.toLowerCase().includes(filter)) : etfData;
-      $("etf-count").textContent = data.length + " ETFs";
-      $("etf-tbody").innerHTML = data.map(e => `
-      <tr>
-        <td class="text-blue">${e.sym}</td>
-        <td class="text-gray-500 text-[10px]">${e.name}</td>
-        <td class="mono">${e.ltp != null ? "₹" + fmt(e.ltp) : '<span class="text-gray-300">—</span>'}</td>
-        <td>${e.chg != null ? chip(e.chg) : '<span class="text-gray-300">—</span>'}</td>
-        <td class="mono text-gray-500">${e.vol ? Number(e.vol).toLocaleString("en-IN") : "—"}</td>
-        <td class="mono text-gray-500">₹${e.aum} Cr</td>
-      </tr>`).join("");
-    }
-
-    // ============================================================
-    // MUTUAL FUNDS (static curated list)
-    // ============================================================
-    const MF_DATA = [
-      { name: "Parag Parikh Flexi Cap Fund", nav: 75.23, ret1d: 0.42, ret1y: 18.3, cat: "equity", aum: "54,200" },
-      { name: "Quant Small Cap Fund", nav: 228.45, ret1d: -0.18, ret1y: 42.1, cat: "equity", aum: "18,900" },
-      { name: "SBI Small Cap Fund", nav: 148.90, ret1d: 0.31, ret1y: 22.4, cat: "equity", aum: "25,600" },
-      { name: "Mirae Asset Large Cap Fund", nav: 105.32, ret1d: 0.12, ret1y: 14.2, cat: "equity", aum: "38,400" },
-      { name: "HDFC Mid-Cap Opportunities", nav: 186.74, ret1d: 0.28, ret1y: 28.6, cat: "equity", aum: "62,100" },
-      { name: "Axis Bluechip Fund", nav: 58.19, ret1d: -0.04, ret1y: 11.8, cat: "equity", aum: "31,200" },
-      { name: "Nippon India Growth Fund", nav: 3420.15, ret1d: 0.45, ret1y: 35.2, cat: "equity", aum: "22,800" },
-      { name: "UTI Nifty 50 Index Fund", nav: 142.30, ret1d: 0.22, ret1y: 13.4, cat: "index", aum: "15,700" },
-      { name: "HDFC Index Nifty 50 Fund", nav: 618.40, ret1d: 0.21, ret1y: 13.2, cat: "index", aum: "19,200" },
-      { name: "Navi Nifty 50 Index Fund", nav: 16.82, ret1d: 0.20, ret1y: 13.0, cat: "index", aum: "890" },
-      { name: "ICICI Pru Corporate Bond Fund", nav: 28.44, ret1d: 0.03, ret1y: 7.1, cat: "debt", aum: "22,300" },
-      { name: "HDFC Corporate Bond Fund", nav: 31.20, ret1d: 0.04, ret1y: 7.4, cat: "debt", aum: "28,900" },
-      { name: "SBI Magnum Gilt Fund", nav: 68.90, ret1d: 0.12, ret1y: 8.2, cat: "debt", aum: "4,100" },
-      { name: "Kotak Dynamic Bond Fund", nav: 35.18, ret1d: 0.05, ret1y: 7.8, cat: "debt", aum: "2,800" },
-      { name: "HDFC Balanced Advantage Fund", nav: 432.50, ret1d: 0.18, ret1y: 16.8, cat: "hybrid", aum: "88,500" },
-      { name: "ICICI Pru Balanced Advantage", nav: 58.34, ret1d: 0.14, ret1y: 14.2, cat: "hybrid", aum: "62,000" },
-      { name: "Mirae Asset Hybrid Equity", nav: 32.10, ret1d: 0.16, ret1y: 15.6, cat: "hybrid", aum: "8,200" },
-      { name: "Nippon India Nifty BeES (ETF)", nav: 248.30, ret1d: 0.21, ret1y: 13.1, cat: "index", aum: "12,400" },
-    ];
-    mfData = MF_DATA;
-
-    function setMFCat(cat, btn) {
-      mfCategory = cat;
-      document.querySelectorAll("#tab-mf .tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderMFTable();
-    }
-
-    function filterMF() {
-      renderMFTable($("mf-search").value.toLowerCase());
-    }
-
-    function renderMFTable(filter = "") {
-      let data = mfData.filter(f => f.cat === mfCategory || (mfCategory === "all"));
-      if (filter) data = data.filter(f => f.name.toLowerCase().includes(filter));
-      $("mf-tbody").innerHTML = data.map(f => `
-      <tr>
-        <td class="text-[11px]">${f.name}</td>
-        <td class="mono">₹${fmt(f.nav)}</td>
-        <td>${chip(f.ret1d)}</td>
-        <td class="font-semibold text-[11px] ${f.ret1y >= 0 ? 'text-green' : 'text-red'}">${f.ret1y >= 0 ? "+" : ""}${f.ret1y}%</td>
-        <td><span class="bg-gray-100 rounded px-1.5 py-0.5 text-[10px] text-gray-500 capitalize">${f.cat}</span></td>
-        <td class="mono text-gray-500">₹${f.aum} Cr</td>
-      </tr>`).join("");
-    }
-
-    // ============================================================
-    // OPTIONS / F&O
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    // OPTION CHAIN
+    // ═══════════════════════════════════════════════════
     async function loadFnO() {
       const sym = ($("fno-sym").value || "NIFTY").trim().toUpperCase();
-      $("oc-tbody").innerHTML = `<tr><td colspan="11" class="text-center py-5 text-gray-400">Loading option chain...</td></tr>`;
+      $("oc-tbody").innerHTML = `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text3)">Loading option chain...</td></tr>`;
       $("fno-stats").innerHTML = "";
       try {
-        const d = await api(`/api/option-chain/${sym}`);
+        const d = await api("/api/option-chain/" + sym);
         ocData = d;
         const expiries = d.expiries || [];
-        $("fno-expiry").innerHTML = expiries.map(e => `<option value="${e}">${e}</option>`).join("");
+        $("fno-expiry").innerHTML = expiries.map(e => `<option>${e}</option>`).join("");
         renderOC();
       } catch (e) {
-        $("oc-tbody").innerHTML = `<tr><td colspan="11" class="text-center py-5 text-gray-400">Option chain not available or API offline</td></tr>`;
+        $("oc-tbody").innerHTML = `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text3)">Option chain not available or API offline</td></tr>`;
       }
     }
 
@@ -826,133 +1848,346 @@
       const expiry = $("fno-expiry").value;
       const records = (ocData.data || []).filter(r => !expiry || r.expiryDate === expiry);
       const atm = ocData.underlyingValue || 0;
-
       let totalCOI = 0, totalPOI = 0;
       records.forEach(r => { r.CE && (totalCOI += r.CE.openInterest || 0); r.PE && (totalPOI += r.PE.openInterest || 0); });
       const pcr = totalCOI > 0 ? (totalPOI / totalCOI).toFixed(2) : "—";
       const pcrNum = parseFloat(pcr);
-
       $("fno-stats").innerHTML = [
-        ["Underlying", `₹${fmt(atm)}`, "text-gray-800"],
-        ["PCR", pcr, pcrNum > 1 ? "text-green" : pcrNum < 0.8 ? "text-red" : "text-yellow"],
-        ["Total C-OI", Number(totalCOI).toLocaleString("en-IN"), "text-gray-600"],
-        ["Total P-OI", Number(totalPOI).toLocaleString("en-IN"), "text-gray-600"],
-      ].map(([k, v, c]) => `
-      <div class="card px-3 py-2">
-        <div class="section-label">${k}</div>
-        <div class="mono text-[13px] font-semibold ${c}">${v}</div>
-      </div>`).join("");
+        ["Underlying", `₹${fmt(atm)}`, ""],
+        ["PCR", pcr, pcrNum > 1 ? "g" : pcrNum < 0.8 ? "r" : "y"],
+        ["Total C-OI", Number(totalCOI).toLocaleString("en-IN"), ""],
+        ["Total P-OI", Number(totalPOI).toLocaleString("en-IN"), ""],
+      ].map(([k, v, c]) => `<div class="stat-chip"><div class="stat-label">${k}</div><div class="stat-val ${c}">${v}</div></div>`).join("");
 
       const strikes = [...new Set(records.map(r => r.strikePrice))].sort((a, b) => a - b);
-      const maxOI = Math.max(...records.map(r => Math.max(r.CE?.openInterest || 0, r.PE?.openInterest || 0)));
-
       $("oc-tbody").innerHTML = strikes.map(s => {
         const r = records.find(r => r.strikePrice === s) || {};
-        const ce = r.CE || {}; const pe = r.PE || {};
+        const ce = r.CE || {}, pe = r.PE || {};
         const isATM = Math.abs(s - atm) < (atm * 0.005);
-        return `<tr class="${isATM ? 'oc-atm' : ''}">
-          <td class="mono text-[10px]">${ce.openInterest ? Number(ce.openInterest).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-[10px] ${(ce.changeinOpenInterest || 0) >= 0 ? 'text-green' : 'text-red'}">${ce.changeinOpenInterest != null ? (ce.changeinOpenInterest >= 0 ? "+" : "") + Number(ce.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-[10px]">${ce.totalTradedVolume ? Number(ce.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-[10px] text-yellow">${ce.impliedVolatility ? ce.impliedVolatility.toFixed(1) + "%" : "—"}</td>
-          <td class="mono text-[11px] font-semibold text-green">${ce.lastPrice ? "₹" + fmt(ce.lastPrice) : "—"}</td>
-          <td class="mono text-[11px] font-bold text-center bg-gray-50 ${isATM ? 'text-yellow' : 'text-gray-800'}">${fmt(s, 0)}</td>
-          <td class="mono text-[11px] font-semibold text-red">${pe.lastPrice ? "₹" + fmt(pe.lastPrice) : "—"}</td>
-          <td class="mono text-[10px] text-yellow">${pe.impliedVolatility ? pe.impliedVolatility.toFixed(1) + "%" : "—"}</td>
-          <td class="mono text-[10px]">${pe.totalTradedVolume ? Number(pe.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-[10px] ${(pe.changeinOpenInterest || 0) >= 0 ? 'text-green' : 'text-red'}">${pe.changeinOpenInterest != null ? (pe.changeinOpenInterest >= 0 ? "+" : "") + Number(pe.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-[10px]">${pe.openInterest ? Number(pe.openInterest).toLocaleString("en-IN") : "—"}</td>
-        </tr>`;
-      }).join("") || `<tr><td colspan="11" class="text-center py-5 text-gray-400">No data for selected expiry</td></tr>`;
+        return `<tr class="${isATM ? "oc-atm" : ""}">
+      <td>${ce.openInterest ? Number(ce.openInterest).toLocaleString("en-IN") : "—"}</td>
+      <td class="${(ce.changeinOpenInterest || 0) >= 0 ? "g" : "r"}">${ce.changeinOpenInterest != null ? (ce.changeinOpenInterest >= 0 ? "+" : "") + Number(ce.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
+      <td>${ce.totalTradedVolume ? Number(ce.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+      <td class="y">${ce.impliedVolatility ? ce.impliedVolatility.toFixed(1) + "%" : "—"}</td>
+      <td class="g" style="font-weight:600">${ce.lastPrice ? "₹" + fmt(ce.lastPrice) : "—"}</td>
+      <td class="strike-cell" style="text-align:center;background:var(--bg3);font-weight:700">${fmt(s, 0)}</td>
+      <td class="r" style="font-weight:600">${pe.lastPrice ? "₹" + fmt(pe.lastPrice) : "—"}</td>
+      <td class="y">${pe.impliedVolatility ? pe.impliedVolatility.toFixed(1) + "%" : "—"}</td>
+      <td>${pe.totalTradedVolume ? Number(pe.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+      <td class="${(pe.changeinOpenInterest || 0) >= 0 ? "g" : "r"}">${pe.changeinOpenInterest != null ? (pe.changeinOpenInterest >= 0 ? "+" : "") + Number(pe.changeinOpenInterest).toLocaleString("en-IN") : "—"}</td>
+      <td>${pe.openInterest ? Number(pe.openInterest).toLocaleString("en-IN") : "—"}</td>
+    </tr>`;
+      }).join() || `<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text3)">No data for selected expiry</td></tr>`;
     }
 
-    // ============================================================
-    // GLOBAL MARKETS (static data)
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    // PRE-OPEN  ← NEW
+    // ═══════════════════════════════════════════════════
+    async function loadPreopen() {
+      try {
+        const r = await api("/api/preopen?key=" + currentPreopenKey);
+        preOpenRaw = r;
+        renderPreopen();
+      } catch (e) {
+        $("po-tbody").innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3)">Pre-open data not available</td></tr>`;
+      }
+    }
+
+    function switchPreopenKey(key, btn) {
+      currentPreopenKey = key;
+      $("po-key-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadPreopen();
+    }
+
+    function renderPreopen() {
+      const raw = preOpenRaw;
+      if (!raw || !raw.data) return;
+      const filter = parseFloat($("po-filter")?.value || 1.5);
+      $("po-stats").innerHTML = [
+        ["Advances", raw.advances, "g"],
+        ["Declines", raw.declines, "r"],
+        ["Unchanged", raw.unchanged, ""],
+        ["Stocks", raw.data.length, "b"],
+      ].map(([k, v, c]) => `<div class="stat-chip"><div class="stat-label">${k}</div><div class="stat-val ${c}">${v ?? '—'}</div></div>`).join("");
+
+      const sorted = [...raw.data].sort((a, b) => (b.pChange || 0) - (a.pChange || 0));
+      const gainers = sorted.filter(s => (s.pChange || 0) >= filter);
+      const losers = [...sorted].reverse().filter(s => (s.pChange || 0) <= -filter);
+
+      function poRow(s, up) {
+        return `<div class="po-row">
+      <div><div class="gl-sym">${s.symbol || "—"}</div><div class="gl-vol">Prev: ₹${fmt(s.previousClose)}</div></div>
+      <div style="text-align:right">
+        <div class="mono" style="font-size:11px">₹${fmt(s.iep || s.finalPrice)}</div>
+        <div class="${up ? "g" : "r"}" style="font-family:var(--font-mono);font-size:10px;font-weight:600">${pct(s.pChange)}</div>
+      </div>
+    </div>`;
+      }
+      $("po-gainers").innerHTML = gainers.length ? gainers.map(s => poRow(s, true)).join("") : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">No gap-ups ≥ ${filter}%</div>`;
+      $("po-losers").innerHTML = losers.length ? losers.map(s => poRow(s, false)).join("") : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:11px">No gap-downs ≤ -${filter}%</div>`;
+
+      $("po-count").textContent = raw.data.length + " stocks";
+      $("po-tbody").innerHTML = sorted.map(s => `
+    <tr>
+      <td style="color:var(--blue)">${s.symbol || "—"}</td>
+      <td>${s.iep ? `₹${fmt(s.iep)}` : "—"}</td>
+      <td>${s.previousClose ? `₹${fmt(s.previousClose)}` : "—"}</td>
+      <td>${chip(s.pChange)}</td>
+      <td class="muted">${s.buyQuantity ? Number(s.buyQuantity).toLocaleString("en-IN") : "—"}</td>
+      <td class="muted">${s.sellQuantity ? Number(s.sellQuantity).toLocaleString("en-IN") : "—"}</td>
+      <td class="muted">${s.finalQuantity ? Number(s.finalQuantity).toLocaleString("en-IN") : "—"}</td>
+      <td style="font-size:10px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.purpose || "—"}</td>
+    </tr>`).join() || `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text3)">No data</td></tr>`;
+    }
+
+    // ═══════════════════════════════════════════════════
+    // FII / DII  ← NEW
+    // ═══════════════════════════════════════════════════
+    async function loadFIIDII() {
+      $("fii-tbody").innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr>`;
+      try {
+        const d = await api("/api/fii-dii");
+        const data = d.data || [];
+        // Aggregate today's stats
+        const today = data[0] || {};
+        const fii = data.find(r => (r.category || "").includes("FII")) || {};
+        const dii = data.find(r => (r.category || "").includes("DII")) || {};
+        $("fii-stats").innerHTML = [
+          ["FII Buy", `₹${fmt(fii.buyValue)} Cr`, "g"],
+          ["FII Sell", `₹${fmt(fii.sellValue)} Cr`, "r"],
+          ["FII Net", `₹${fmt(fii.netValue)} Cr`, fii.netValue >= 0 ? "g" : "r"],
+          ["DII Buy", `₹${fmt(dii.buyValue)} Cr`, "g"],
+          ["DII Sell", `₹${fmt(dii.sellValue)} Cr`, "r"],
+          ["DII Net", `₹${fmt(dii.netValue)} Cr`, dii.netValue >= 0 ? "g" : "r"],
+        ].map(([k, v, c]) => `<div class="stat-chip"><div class="stat-label">${k}</div><div class="stat-val ${c}">${v}</div></div>`).join("");
+
+        $("fii-tbody").innerHTML = data.map(r => {
+          const net = parseFloat(r.netValue) || 0;
+          return `<tr>
+        <td>${r.category || "—"}</td>
+        <td class="muted">${r.date || "—"}</td>
+        <td class="g">₹${fmt(r.buyValue)} Cr</td>
+        <td class="r">₹${fmt(r.sellValue)} Cr</td>
+        <td class="${net >= 0 ? "g" : "r"}" style="font-weight:600">${net >= 0 ? "+" : ""}₹${fmt(r.netValue)} Cr</td>
+      </tr>`;
+        }).join() || `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No data</td></tr>`;
+      } catch (e) {
+        $("fii-tbody").innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">FII/DII data not available</td></tr>`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // EVENTS  ← NEW
+    // ═══════════════════════════════════════════════════
+    async function loadEvents() {
+      $("ev-list").innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3)">Loading events...</div>`;
+      try {
+        const d = await api("/api/events");
+        eventsRaw = d.data || [];
+        renderEvents();
+      } catch (e) {
+        $("ev-list").innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3)">Events not available</div>`;
+      }
+    }
+
+    function filterEvents() { renderEvents(); }
+
+    function renderEvents() {
+      const search = ($("ev-search")?.value || "").toLowerCase();
+      let data = eventsRaw;
+      if (search) data = data.filter(r => (r.symbol || "").toLowerCase().includes(search) || (r.purpose || "").toLowerCase().includes(search));
+      $("ev-count").textContent = data.length + " events";
+      $("ev-list").innerHTML = data.slice(0, 100).map(r => `
+    <div class="ev-row">
+      <span class="ev-date">${r.date || r.bDayFlag || "—"}</span>
+      <span class="ev-sym b">${r.symbol || "—"}</span>
+      <span class="ev-purpose">${r.purpose || r.description || "—"}</span>
+      ${r.series ? `<span class="chip chip-b" style="font-size:9px">${r.series}</span>` : ""}
+    </div>`).join() || `<div style="padding:20px;text-align:center;color:var(--text3)">No events found</div>`;
+    }
+
+    // ═══════════════════════════════════════════════════
+    // DEALS  ← NEW
+    // ═══════════════════════════════════════════════════
+    async function loadDeals() {
+      // Block deals
+      try {
+        const d = await api("/api/block-deals");
+        const data = d.data || [];
+        $("block-tbody").innerHTML = data.length ? data.map(r => `
+      <tr>
+        <td style="color:var(--blue)">${r.symbol || r.scrip_code || "—"}</td>
+        <td style="font-size:10px">${r.clientName || r.client || "—"}</td>
+        <td class="${(r.buySellFlag || r.deal_type || "").toLowerCase().includes("buy") ? "g" : "r"}">${r.buySellFlag || r.deal_type || "—"}</td>
+        <td class="muted">${r.quantity ? Number(r.quantity).toLocaleString("en-IN") : "—"}</td>
+        <td>₹${fmt(r.price || r.tradePrice)}</td>
+        <td class="muted">${r.mktType || r.date || "—"}</td>
+      </tr>`).join() : `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No block deals today</td></tr>`;
+      } catch (e) {
+        $("block-tbody").innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Block deal data not available</td></tr>`;
+      }
+      loadLargeDeals(currentDealType);
+    }
+
+    async function switchDeal(type, btn) {
+      currentDealType = type;
+      $("deal-tabs").querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadLargeDeals(type);
+    }
+
+    async function loadLargeDeals(type) {
+      $("large-deal-title").textContent = { bulk_deals: "Bulk Deals", block_deals: "Block Deals", short_sell: "Short Sell" }[type] || "Large Deals";
+      $("large-deal-tbody").innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr>`;
+      try {
+        const d = await api("/api/large-deals?bandtype=" + type);
+        const data = Array.isArray(d.data) ? d.data : [];
+        $("large-deal-tbody").innerHTML = data.length ? data.map(r => {
+          const keys = Object.keys(r);
+          const sym = r.symbol || r.scrip || r.Symbol || r[keys[0]] || "—";
+          const client = r.clientName || r.client || r.Client || r[keys[1]] || "—";
+          const bs = r.buySellFlag || r.buyOrSell || r[keys[2]] || "—";
+          const qty = r.quantity || r.Quantity || r[keys[3]] || 0;
+          const price = r.price || r.Price || r.tradePrice || r[keys[4]] || 0;
+          const val = r.value || r.Value || (qty && price ? (qty * price) : 0);
+          return `<tr>
+        <td style="color:var(--blue)">${sym}</td>
+        <td style="font-size:10px">${client}</td>
+        <td class="${String(bs).toLowerCase().includes("buy") ? "g" : "r"}">${bs}</td>
+        <td class="muted">${qty ? Number(qty).toLocaleString("en-IN") : "—"}</td>
+        <td>₹${fmt(price)}</td>
+        <td class="muted">${val ? `₹${fmt(val / 1e7, 2)} Cr` : "—"}</td>
+      </tr>`;
+        }).join() : `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No ${type.replace(/_/g, " ")} data today</td></tr>`;
+      } catch (e) {
+        $("large-deal-tbody").innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Data not available</td></tr>`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // HISTORY  ← NEW
+    // ═══════════════════════════════════════════════════
+    function initHistoryDates() {
+      const now = new Date();
+      const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, "0"), d = String(now.getDate()).padStart(2, "0");
+      const past = new Date(now - 90 * 24 * 3600 * 1000);
+      const py = past.getFullYear(), pm = String(past.getMonth() + 1).padStart(2, "0"), pd = String(past.getDate()).padStart(2, "0");
+      if (!$("hist-from").value) $("hist-from").value = `${py}-${pm}-${pd}`;
+      if (!$("hist-to").value) $("hist-to").value = `${y}-${m}-${d}`;
+    }
+
+    async function loadHistory() {
+      const sym = ($("hist-sym").value || "").trim().toUpperCase();
+      if (!sym) { alert("Enter a symbol"); return; }
+      const series = $("hist-series").value || "EQ";
+      const rawFrom = $("hist-from").value, rawTo = $("hist-to").value;
+      if (!rawFrom || !rawTo) { alert("Enter date range"); return; }
+      // Convert YYYY-MM-DD → DD-MM-YYYY
+      const from = rawFrom.split("-").reverse().join("-");
+      const to = rawTo.split("-").reverse().join("-");
+      $("hist-tbody").innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3)">Loading...</td></tr>`;
+      $("hist-result-meta").innerHTML = "";
+      try {
+        const d = await api(`/api/history/${sym}?series=${series}&from=${from}&to=${to}`);
+        const data = d.data || [];
+        $("hist-result-meta").innerHTML = `<div class="flex gap-2 items-center mb-2">
+      <span style="font-size:12px;font-weight:600">${sym}</span>
+      <span class="chip chip-b">${series}</span>
+      <span class="muted" style="font-size:11px">${data.length} trading days</span>
+    </div>`;
+        $("hist-tbody").innerHTML = data.map(r => {
+          const c = r.CH_CLOSING_PRICE || r.close || r.CLOSE || 0;
+          const prev = r.CH_PREVIOUS_CLS_PRICE || r.prevClose || r.PREV_CLS || 0;
+          const chg = prev ? ((c - prev) / prev * 100) : 0;
+          return `<tr>
+        <td>${r.CH_TIMESTAMP || r.date || r.DATE || "—"}</td>
+        <td>₹${fmt(r.CH_OPENING_PRICE || r.open || r.OPEN)}</td>
+        <td class="g">₹${fmt(r.CH_TRADE_HIGH_PRICE || r.high || r.HIGH)}</td>
+        <td class="r">₹${fmt(r.CH_TRADE_LOW_PRICE || r.low || r.LOW)}</td>
+        <td class="${colCls(chg)}" style="font-weight:600">₹${fmt(c)}</td>
+        <td class="muted">₹${fmt(prev)}</td>
+        <td class="muted">${(r.CH_TOT_TRADED_QTY || r.volume || r.VOLUME) ? Number(r.CH_TOT_TRADED_QTY || r.volume || r.VOLUME).toLocaleString("en-IN") : "—"}</td>
+        <td class="muted">${(r.CH_TOTAL_TRADES || r.trades || "") ? (r.CH_TOTAL_TRADES || r.trades).toLocaleString("en-IN") : "—"}</td>
+        <td class="muted">₹${fmt(r.CH_TOT_TRADED_VAL || r.turnover, 0)}</td>
+      </tr>`;
+        }).join() || `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3)">No data returned</td></tr>`;
+      } catch (e) {
+        $("hist-tbody").innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3)">History not available for this symbol/range</td></tr>`;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // GLOBAL (static)
+    // ═══════════════════════════════════════════════════
     const GLOBAL_STATIC = [
-      { name: "S&P 500", val: 5218, chg: 0.42, flag: "🇺🇸" },
-      { name: "NASDAQ", val: 16340, chg: 0.61, flag: "🇺🇸" },
-      { name: "DOW JONES", val: 39420, chg: 0.18, flag: "🇺🇸" },
-      { name: "FTSE 100", val: 8042, chg: -0.22, flag: "🇬🇧" },
-      { name: "DAX", val: 18200, chg: 0.35, flag: "🇩🇪" },
-      { name: "CAC 40", val: 8012, chg: 0.28, flag: "🇫🇷" },
-      { name: "Nikkei 225", val: 38900, chg: -0.44, flag: "🇯🇵" },
-      { name: "Hang Seng", val: 17240, chg: 1.12, flag: "🇭🇰" },
-      { name: "Shanghai", val: 3100, chg: 0.52, flag: "🇨🇳" },
-      { name: "Sensex", val: 74200, chg: 0.38, flag: "🇮🇳" },
+      { name: "S&P 500", val: 5218, chg: 0.42, flag: "🇺🇸" }, { name: "NASDAQ", val: 16340, chg: 0.61, flag: "🇺🇸" },
+      { name: "DOW JONES", val: 39420, chg: 0.18, flag: "🇺🇸" }, { name: "FTSE 100", val: 8042, chg: -0.22, flag: "🇬🇧" },
+      { name: "DAX", val: 18200, chg: 0.35, flag: "🇩🇪" }, { name: "CAC 40", val: 8012, chg: 0.28, flag: "🇫🇷" },
+      { name: "Nikkei 225", val: 38900, chg: -0.44, flag: "🇯🇵" }, { name: "Hang Seng", val: 17240, chg: 1.12, flag: "🇭🇰" },
+      { name: "Shanghai", val: 3100, chg: 0.52, flag: "🇨🇳" }, { name: "Sensex", val: 74200, chg: 0.38, flag: "🇮🇳" },
     ];
-    const COMMODITIES_STATIC = [
-      { name: "Gold (USD/oz)", val: 2320, chg: 0.28 },
-      { name: "Silver (USD/oz)", val: 27.4, chg: 0.55 },
-      { name: "Crude Oil WTI", val: 82.4, chg: -0.32 },
-      { name: "Brent Crude", val: 86.1, chg: -0.18 },
-      { name: "Natural Gas", val: 1.82, chg: -1.24 },
-      { name: "Copper (USD/lb)", val: 4.52, chg: 0.44 },
+    const COM_STATIC = [
+      { name: "Gold (USD/oz)", val: 2320, chg: 0.28 }, { name: "Silver (USD/oz)", val: 27.4, chg: 0.55 },
+      { name: "Crude WTI", val: 82.4, chg: -0.32 }, { name: "Brent Crude", val: 86.1, chg: -0.18 },
+      { name: "Natural Gas", val: 1.82, chg: -1.24 }, { name: "Copper", val: 4.52, chg: 0.44 },
     ];
     const FOREX_STATIC = [
-      { name: "USD/INR", val: 83.42, chg: 0.04 },
-      { name: "EUR/INR", val: 89.21, chg: -0.12 },
-      { name: "GBP/INR", val: 104.8, chg: 0.08 },
-      { name: "JPY/INR", val: 0.548, chg: -0.02 },
-      { name: "AUD/INR", val: 54.2, chg: 0.15 },
-      { name: "SGD/INR", val: 61.8, chg: 0.06 },
+      { name: "USD/INR", val: 83.42, chg: 0.04 }, { name: "EUR/INR", val: 89.21, chg: -0.12 },
+      { name: "GBP/INR", val: 104.8, chg: 0.08 }, { name: "JPY/INR", val: 0.548, chg: -0.02 },
+      { name: "AUD/INR", val: 54.2, chg: 0.15 }, { name: "SGD/INR", val: 61.8, chg: 0.06 },
     ];
     const CRYPTO_STATIC = [
-      { name: "Bitcoin", sym: "BTC", val: 62400, chg: 1.42 },
-      { name: "Ethereum", sym: "ETH", val: 3140, chg: 2.18 },
-      { name: "BNB", sym: "BNB", val: 562, chg: 0.88 },
-      { name: "Solana", sym: "SOL", val: 142, chg: 3.22 },
-      { name: "XRP", sym: "XRP", val: 0.518, chg: -0.44 },
-      { name: "USDT", sym: "USDT", val: 1.00, chg: 0.01 },
-      { name: "DOGE", sym: "DOGE", val: 0.142, chg: 2.10 },
-      { name: "Cardano", sym: "ADA", val: 0.44, chg: 1.32 },
-      { name: "Avax", sym: "AVAX", val: 34.2, chg: 1.88 },
-      { name: "Polygon", sym: "POL", val: 0.72, chg: 2.44 },
+      { name: "Bitcoin", sym: "BTC", val: 62400, chg: 1.42 }, { name: "Ethereum", sym: "ETH", val: 3140, chg: 2.18 },
+      { name: "BNB", sym: "BNB", val: 562, chg: 0.88 }, { name: "Solana", sym: "SOL", val: 142, chg: 3.22 },
+      { name: "XRP", sym: "XRP", val: 0.518, chg: -0.44 }, { name: "USDT", sym: "USDT", val: 1.00, chg: 0.01 },
+      { name: "DOGE", sym: "DOGE", val: 0.142, chg: 2.10 }, { name: "Cardano", sym: "ADA", val: 0.44, chg: 1.32 },
+      { name: "Avalanche", sym: "AVAX", val: 34.2, chg: 1.88 }, { name: "Polygon", sym: "POL", val: 0.72, chg: 2.44 },
     ];
 
     function loadGlobal() {
       $("global-grid").innerHTML = GLOBAL_STATIC.map(i => `
-      <div class="idx-card">
-        <div class="flex justify-between items-center mb-1">
-          <span class="section-label mb-0">${i.name}</span>
-          <span class="text-xs">${i.flag}</span>
-        </div>
-        <div class="mono text-[13px] font-semibold text-gray-800">${Number(i.val).toLocaleString("en-US")}</div>
-        <div>${chip(i.chg)}</div>
-      </div>`).join("");
+    <div class="idx-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span class="idx-card-name" style="margin-bottom:0">${i.name}</span>
+        <span style="font-size:14px">${i.flag}</span>
+      </div>
+      <div class="idx-card-val">${Number(i.val).toLocaleString("en-US")}</div>
+      <div class="idx-card-bottom">${chip(i.chg)}</div>
+    </div>`).join("");
 
-      $("commodities-list").innerHTML = COMMODITIES_STATIC.map(c => `
-      <div class="flex justify-between px-3.5 py-1.5 border-b border-gray-50">
-        <span class="text-[11px] text-gray-600">${c.name}</span>
-        <span class="mono text-[11px] flex items-center gap-1.5">${c.val} ${chip(c.chg)}</span>
-      </div>`).join("");
+      $("commodities-list").innerHTML = COM_STATIC.map(c => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text2)">${c.name}</span>
+      <span class="mono" style="font-size:11px;display:flex;align-items:center;gap:8px">${c.val} ${chip(c.chg)}</span>
+    </div>`).join("");
 
       $("forex-list").innerHTML = FOREX_STATIC.map(f => `
-      <div class="flex justify-between px-3.5 py-1.5 border-b border-gray-50">
-        <span class="text-[11px] text-gray-600">${f.name}</span>
-        <span class="mono text-[11px] flex items-center gap-1.5">${fmt(f.val, 3)} ${chip(f.chg)}</span>
-      </div>`).join("");
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text2)">${f.name}</span>
+      <span class="mono" style="font-size:11px;display:flex;align-items:center;gap:8px">${fmt(f.val, 3)} ${chip(f.chg)}</span>
+    </div>`).join("");
 
       $("crypto-grid").innerHTML = CRYPTO_STATIC.map(c => `
-      <div class="grid-cell">
-        <div class="text-[10px] font-bold text-gray-400 mb-0.5">${c.sym}</div>
-        <div class="mono text-[11px] font-semibold text-gray-800">$${Number(c.val).toLocaleString("en-US")}</div>
-        <div class="text-[10px] font-semibold ${colCls(c.chg)}">${pct(c.chg)}</div>
-      </div>`).join("");
+    <div class="grid-cell">
+      <div class="grid-cell-sym">${c.sym}</div>
+      <div class="grid-cell-val">$${Number(c.val).toLocaleString("en-US")}</div>
+      <div class="${colCls(c.chg)}" style="font-family:var(--font-mono);font-size:10px;font-weight:600">${pct(c.chg)}</div>
+    </div>`).join("");
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // PORTFOLIO
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     function addHolding() {
       const sym = ($("p-sym").value || "").trim().toUpperCase();
       const qty = parseFloat($("p-qty").value || 0);
       const avg = parseFloat($("p-avg").value || 0);
       const exc = ($("p-exc").value || "NSE").trim().toUpperCase();
-      if (!sym || !qty || !avg) return alert("Fill all fields");
+      if (!sym || !qty || !avg) { alert("Fill all fields"); return; }
       portfolio = portfolio.filter(h => h.sym !== sym);
       portfolio.push({ sym, qty, avg, exc });
-      savePortfolio();
+      localStorage.setItem("nse_portfolio", JSON.stringify(portfolio));
       $("p-sym").value = $("p-qty").value = $("p-avg").value = $("p-exc").value = "";
       renderPortfolio();
       fetchPortfolioLive();
@@ -960,83 +2195,57 @@
 
     function removeHolding(sym) {
       portfolio = portfolio.filter(h => h.sym !== sym);
-      savePortfolio();
-      renderPortfolio();
-    }
-
-    function clearPortfolio() {
-      portfolio = [];
-      savePortfolio();
-      renderPortfolio();
-    }
-
-    function savePortfolio() {
       localStorage.setItem("nse_portfolio", JSON.stringify(portfolio));
+      renderPortfolio();
     }
+
+    function clearPortfolio() { portfolio = []; localStorage.setItem("nse_portfolio", "[]"); renderPortfolio(); }
 
     async function fetchPortfolioLive() {
       for (const h of portfolio) {
-        try {
-          const d = await api(`/api/quote/${h.sym}`);
-          portfolioLive[h.sym] = d.lastPrice || d.ltp || 0;
-        } catch (e) { portfolioLive[h.sym] = null; }
+        try { const d = await api("/api/quote/" + h.sym); portfolioLive[h.sym] = d.lastPrice || 0; }
+        catch (e) { portfolioLive[h.sym] = null; }
       }
       renderPortfolio();
     }
 
     function renderPortfolio() {
       if (!portfolio.length) {
-        $("portfolio-rows").innerHTML = `<div class="px-4 py-6 text-center text-[11px] text-gray-400">No holdings added yet. Add stocks from other platforms with your average price.</div>`;
-        $("portfolio-summary").innerHTML = "";
-        return;
+        $("portfolio-rows").innerHTML = `<div style="padding:24px;text-align:center;font-size:11px;color:var(--text3)">No holdings added yet</div>`;
+        $("portfolio-summary").innerHTML = ""; return;
       }
-      let totalInv = 0, totalCurr = 0;
+      let totInv = 0, totCur = 0;
       portfolio.forEach(h => {
-        const ltp = portfolioLive[h.sym];
-        totalInv += h.qty * h.avg;
-        if (ltp) totalCurr += h.qty * ltp;
+        totInv += h.qty * h.avg;
+        if (portfolioLive[h.sym]) totCur += h.qty * portfolioLive[h.sym];
       });
-      const pnl = totalCurr - totalInv;
-      const pnlPct = totalInv > 0 ? ((pnl / totalInv) * 100) : 0;
-
+      const pnl = totCur - totInv, pnlPct = totInv > 0 ? (pnl / totInv * 100) : 0;
       $("portfolio-summary").innerHTML = [
-        ["Invested", `₹${fmt(totalInv)}`, "text-gray-800"],
-        ["Current Value", totalCurr > 0 ? `₹${fmt(totalCurr)}` : "Fetching...", "text-gray-800"],
-        ["Total P&L", totalCurr > 0 ? `${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}` : "-", colCls(pnl)],
-        ["Return%", totalCurr > 0 ? `${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%` : "-", colCls(pnlPct)],
-        ["Holdings", portfolio.length, "text-blue"],
-      ].map(([k, v, c]) => `
-      <div class="card px-3.5 py-2.5">
-        <div class="section-label">${k}</div>
-        <div class="mono text-[14px] font-semibold ${c}">${v}</div>
-      </div>`).join("");
+        ["Invested", `₹${fmt(totInv)}`, ""],
+        ["Current", totCur > 0 ? `₹${fmt(totCur)}` : "Fetching...", ""],
+        ["P&L", totCur > 0 ? `${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}` : "—", colCls(pnl)],
+        ["Return%", totCur > 0 ? pct(pnlPct) : "—", colCls(pnlPct)],
+        ["Holdings", portfolio.length, "b"],
+      ].map(([k, v, c]) => `<div class="stat-chip"><div class="stat-label">${k}</div><div class="stat-val ${c}">${v}</div></div>`).join("");
 
       $("portfolio-rows").innerHTML = portfolio.map(h => {
         const ltp = portfolioLive[h.sym];
         const pnl = ltp != null ? ((ltp - h.avg) * h.qty) : null;
-        const pnlPct = ltp != null ? (((ltp - h.avg) / h.avg) * 100) : null;
-        return `<div class="portfolio-row">
-          <div>
-            <div class="text-[12px] font-bold text-gray-900">${h.sym}</div>
-            <div class="text-[9px] text-gray-400">${h.exc} • Qty: ${h.qty}</div>
-          </div>
-          <div class="mono text-[11px] text-right text-gray-500">${h.qty}</div>
-          <div class="mono text-[11px] text-right text-gray-500">₹${fmt(h.avg)}</div>
-          <div class="mono text-[11px] text-right ${ltp ? 'text-gray-700' : 'text-gray-300'}">${ltp ? "₹" + fmt(ltp) : '<span class="text-[9px]">Fetching…</span>'}</div>
-          <div class="text-right">
-            ${pnl != null ? `<div class="mono text-[11px] font-semibold ${colCls(pnl)}">${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}</div>
-            <div class="text-[10px] ${colCls(pnlPct)}">${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(2)}%</div>` : `<span class="text-[9px] text-gray-300">—</span>`}
-          </div>
-          <div class="text-right">
-            <button onclick="removeHolding('${h.sym}')" class="btn-remove">✕</button>
-          </div>
-        </div>`;
+        const pnlPct = ltp != null ? ((ltp - h.avg) / h.avg * 100) : null;
+        return `<div class="p-row">
+      <div><div style="font-size:12px;font-weight:700">${h.sym}</div><div style="font-size:9px;color:var(--text3)">${h.exc} · Qty: ${h.qty}</div></div>
+      <div class="mono muted" style="text-align:right;font-size:11px">${h.qty}</div>
+      <div class="mono muted" style="text-align:right;font-size:11px">₹${fmt(h.avg)}</div>
+      <div class="mono" style="text-align:right;font-size:11px;color:${ltp ? "var(--text)" : "var(--text3)"}">${ltp ? `₹${fmt(ltp)}` : "Fetching…"}</div>
+      <div style="text-align:right">${pnl != null ? `<div class="mono ${colCls(pnl)}" style="font-size:11px;font-weight:600">${pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pnl))}</div><div class="${colCls(pnlPct)}" style="font-size:10px">${pct(pnlPct)}</div>` : `<span class="muted" style="font-size:10px">—</span>`}</div>
+      <div style="text-align:right"><button onclick="removeHolding('${h.sym}')" class="btn-remove">✕</button></div>
+    </div>`;
       }).join("");
     }
 
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     // WATCHLIST
-    // ============================================================
+    // ═══════════════════════════════════════════════════
     function addToWatchlist() {
       const sym = ($("wl-input").value || "").trim().toUpperCase();
       if (!sym) return;
@@ -1054,10 +2263,8 @@
 
     async function fetchWatchlistLive() {
       for (const sym of watchlist) {
-        try {
-          const d = await api(`/api/quote/${sym}`);
-          watchlistLive[sym] = d;
-        } catch (e) { }
+        try { const d = await api("/api/quote/" + sym); watchlistLive[sym] = d; }
+        catch (e) { }
       }
       if (currentTab === "watchlist") renderWatchlist();
     }
@@ -1065,32 +2272,35 @@
     function renderWatchlist() {
       $("wl-count").textContent = watchlist.length + " symbols";
       if (!watchlist.length) {
-        $("wl-tbody").innerHTML = `<tr><td colspan="9" class="text-center py-5 text-gray-400">Watchlist empty. Add symbols above.</td></tr>`;
-        return;
+        $("wl-tbody").innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3)">Watchlist empty</td></tr>`; return;
       }
       $("wl-tbody").innerHTML = watchlist.map(sym => {
         const d = watchlistLive[sym];
         return `<tr>
-          <td class="text-blue">${sym}</td>
-          <td class="mono">${d ? "₹" + fmt(d.lastPrice) : "—"}</td>
-          <td>${d ? chip(d.pChange) : "—"}</td>
-          <td class="mono text-green">${d ? "₹" + fmt(d.high) : "—"}</td>
-          <td class="mono text-red">${d ? "₹" + fmt(d.low) : "—"}</td>
-          <td class="mono text-gray-500">${d && d.totalTradedVolume ? Number(d.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
-          <td class="mono text-green">${d ? "₹" + fmt(d.weekHighLow?.max) : "—"}</td>
-          <td class="mono text-red">${d ? "₹" + fmt(d.weekHighLow?.min) : "—"}</td>
-          <td><button onclick="removeFromWatchlist('${sym}')" class="btn-remove">✕</button></td>
-        </tr>`;
+      <td style="color:var(--blue)">${sym}</td>
+      <td>${d ? `₹${fmt(d.lastPrice)}` : "—"}</td>
+      <td>${d ? chip(d.pChange) : "—"}</td>
+      <td class="g">${d ? `₹${fmt(d.high)}` : "—"}</td>
+      <td class="r">${d ? `₹${fmt(d.low)}` : "—"}</td>
+      <td class="muted">${d && d.totalTradedVolume ? Number(d.totalTradedVolume).toLocaleString("en-IN") : "—"}</td>
+      <td class="g">${d ? `₹${fmt(d.weekHighLow?.max)}` : "—"}</td>
+      <td class="r">${d ? `₹${fmt(d.weekHighLow?.min)}` : "—"}</td>
+      <td><button onclick="removeFromWatchlist('${sym}')" class="btn-remove">✕</button></td>
+    </tr>`;
       }).join("");
     }
 
-    // ============================================================
-    // LOAD ALL
-    // ============================================================
+    // ═══════════════════════════════════════════════════
+    // BOOT
+    // ═══════════════════════════════════════════════════
     async function loadAll() {
-      const btn = $("refresh-btn");
+      const btn = $("btn-refresh");
       btn.textContent = "⟳ Loading...";
       btn.style.opacity = "0.5";
+      // Clear gl cache so data refreshes
+      if (Object.keys(glCache).length) {
+        Object.keys(glCache).forEach(k => delete glCache[k]);
+      }
       await Promise.all([
         loadMarketStatus(),
         loadIndices(),
@@ -1104,10 +2314,8 @@
     }
 
     loadAll();
-    loadETFQuotes();
     setInterval(loadAll, 30000);
   </script>
-
 </body>
 
 </html>
